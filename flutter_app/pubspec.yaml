@@ -1,0 +1,48 @@
+name: zameen_clone
+description: DHA property listings app — Flutter frontend connected to Django REST backend.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # Routing
+  go_router: ^14.2.0
+
+  # HTTP client — talks to the Django backend
+  dio: ^5.4.3+1
+
+  # Stores JWT tokens securely on the device (encrypted keystore on Android)
+  flutter_secure_storage: ^9.2.2
+
+  # Maps
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+
+  # Photo picking for post-listing screen
+  image_picker: ^1.1.2
+
+  # Video playback for property detail screen
+  video_player: ^2.8.6
+
+  cupertino_icons: ^1.0.6
+
+  # Locks desktop window to phone dimensions
+  window_manager: ^0.4.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
