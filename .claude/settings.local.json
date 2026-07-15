@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./venv/Scripts/python.exe manage.py check)",
+      "Bash(flutter analyze *)",
+      "Bash(powershell -NoProfile -Command \"\\(Get-Content lib\\\\\\\\core\\\\\\\\mock\\\\\\\\mock_data.dart -Raw\\) -replace '\\(?m\\)^\\(\\\\s+\\)PropertyModel\\\\\\(', '\\\\$1const PropertyModel\\(' | Set-Content -NoNewline lib\\\\\\\\core\\\\\\\\mock\\\\\\\\mock_data.dart\")",
+      "Bash(powershell -NoProfile -Command \"\\(Get-Content lib\\\\\\\\features\\\\\\\\profile\\\\\\\\presentation\\\\\\\\screens\\\\\\\\profile_screen.dart -Raw\\) -replace '\\\\.withOpacity\\\\\\(\\(0\\\\.\\\\d+\\)\\\\\\)', '.withValues\\(alpha: \\\\$1\\)' | Set-Content -NoNewline lib\\\\\\\\features\\\\\\\\profile\\\\\\\\presentation\\\\\\\\screens\\\\\\\\profile_screen.dart\")"
+    ]
+  }
+}
