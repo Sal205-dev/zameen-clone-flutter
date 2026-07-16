@@ -3,6 +3,7 @@ import '../../features/favorites/presentation/screens/favorites_screen.dart';
 import '../../features/listings/presentation/screens/listings_screen.dart';
 import '../../features/map_search/presentation/screens/map_search_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
+import '../localization/app_strings.dart';
 import '../theme/app_theme.dart';
 import 'app_drawer.dart';
 
@@ -16,10 +17,10 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
 
-  Widget _buildScreen(int index) {
+  Widget _buildScreen(int index, AppStrings s) {
     switch (index) {
       case 0: return const ListingsScreen();
-      case 1: return const _PlaceholderScreen(label: 'Projects');
+      case 1: return _PlaceholderScreen(label: s.navProjects);
       case 2: return const MapSearchScreen();
       case 3: return const FavoritesScreen();
       case 4: return const ProfileScreen();
@@ -29,9 +30,10 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final s = AppStrings.of(context);
     return Scaffold(
       drawer: const AppDrawer(),
-      body: _buildScreen(_currentIndex),
+      body: _buildScreen(_currentIndex, s),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppColors.surface,
@@ -46,12 +48,12 @@ class _MainShellState extends State<MainShell> {
               children: [
                 _NavItem(
                   icon: Icons.home_outlined, activeIcon: Icons.home_rounded,
-                  label: 'Home', index: 0, current: _currentIndex,
+                  label: s.navHome, index: 0, current: _currentIndex,
                   onTap: (i) => setState(() => _currentIndex = i),
                 ),
                 _NavItem(
                   icon: Icons.location_city_outlined, activeIcon: Icons.location_city_rounded,
-                  label: 'Projects', index: 1, current: _currentIndex,
+                  label: s.navProjects, index: 1, current: _currentIndex,
                   onTap: (i) => setState(() => _currentIndex = i),
                 ),
 
@@ -82,7 +84,7 @@ class _MainShellState extends State<MainShell> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Search',
+                          s.navSearch,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
@@ -98,12 +100,12 @@ class _MainShellState extends State<MainShell> {
 
                 _NavItem(
                   icon: Icons.favorite_border_rounded, activeIcon: Icons.favorite_rounded,
-                  label: 'Favorites', index: 3, current: _currentIndex,
+                  label: s.navFavorites, index: 3, current: _currentIndex,
                   onTap: (i) => setState(() => _currentIndex = i),
                 ),
                 _NavItem(
                   icon: Icons.person_outline_rounded, activeIcon: Icons.person_rounded,
-                  label: 'Profile', index: 4, current: _currentIndex,
+                  label: s.navProfile, index: 4, current: _currentIndex,
                   onTap: (i) => setState(() => _currentIndex = i),
                 ),
               ],
@@ -163,6 +165,7 @@ class _PlaceholderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = AppStrings.of(context);
     return Scaffold(
       body: Center(
         child: Column(
@@ -175,8 +178,8 @@ class _PlaceholderScreen extends StatelessWidget {
                 style: const TextStyle(
                     fontSize: 18, fontWeight: FontWeight.w600)),
             const SizedBox(height: 4),
-            const Text('Coming soon',
-                style: TextStyle(color: AppColors.textSecondary)),
+            Text(s.comingSoon,
+                style: const TextStyle(color: AppColors.textSecondary)),
           ],
         ),
       ),

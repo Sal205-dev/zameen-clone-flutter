@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../localization/app_strings.dart';
+import '../localization/locale_provider.dart';
 import '../theme/app_theme.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 
@@ -10,6 +12,7 @@ class AppDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authNotifierProvider).value;
+    final s = AppStrings.of(context);
 
     return Drawer(
       backgroundColor: AppColors.surface,
@@ -36,17 +39,17 @@ class AppDrawer extends ConsumerWidget {
                             color: Colors.white, size: 20),
                       ),
                       const SizedBox(width: 10),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('DHA',
+                          const Text('DHA',
                               style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.primary,
                                   letterSpacing: -0.5)),
-                          Text('Live better',
-                              style: TextStyle(
+                          Text(s.tagline,
+                              style: const TextStyle(
                                   fontSize: 10,
                                   color: AppColors.textSecondary)),
                         ],
@@ -103,12 +106,12 @@ class AppDrawer extends ConsumerWidget {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 46),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text('Login or Create Account'),
-                          SizedBox(width: 6),
-                          Icon(Icons.arrow_forward_rounded, size: 16),
+                          Text(s.loginOrCreateAccount),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.arrow_forward_rounded, size: 16),
                         ],
                       ),
                     ),
@@ -125,13 +128,13 @@ class AppDrawer extends ConsumerWidget {
                 children: [
                   _DrawerItem(
                     icon: Icons.home_rounded,
-                    label: 'Home',
+                    label: s.navHome,
                     active: true,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.add_home_outlined,
-                    label: 'Add Property',
+                    label: s.addProperty,
                     onTap: () {
                       Navigator.of(context).pop();
                       context.push('/post-listing');
@@ -139,69 +142,72 @@ class AppDrawer extends ConsumerWidget {
                   ),
                   _DrawerItem(
                     icon: Icons.search_rounded,
-                    label: 'Search Properties',
+                    label: s.searchProperties,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.location_city_outlined,
-                    label: 'New Projects',
+                    label: s.newProjects,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.favorite_border_rounded,
-                    label: 'Favorites',
+                    label: s.navFavorites,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.bookmark_border_rounded,
-                    label: 'Saved Searches',
+                    label: s.savedSearches,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.handyman_outlined,
-                    label: 'DHA Tools',
-                    badge: 'New',
+                    label: s.dhaTools,
+                    badge: s.newBadge,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.newspaper_outlined,
-                    label: 'DHA News',
+                    label: s.dhaNews,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.chat_bubble_outline_rounded,
-                    label: 'DHA Blog',
+                    label: s.dhaBlog,
                     onTap: () => Navigator.of(context).pop(),
                   ),
 
                   // ── App Controls section ───────────────────────
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(20, 16, 20, 8),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                     child: Row(
                       children: [
-                        Expanded(child: Divider()),
+                        const Expanded(child: Divider()),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Text('APP CONTROLS',
-                              style: TextStyle(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(s.appControls,
+                              style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textSecondary,
                                   letterSpacing: 0.8)),
                         ),
-                        Expanded(child: Divider()),
+                        const Expanded(child: Divider()),
                       ],
                     ),
                   ),
 
                   _DrawerItem(
                     icon: Icons.language_rounded,
-                    label: 'اردو',
-                    onTap: () => Navigator.of(context).pop(),
+                    label: s.switchLanguageLabel,
+                    onTap: () {
+                      ref.read(localeProvider.notifier).toggle();
+                      Navigator.of(context).pop();
+                    },
                   ),
                   _DrawerItem(
                     icon: Icons.info_outline_rounded,
-                    label: 'About Us',
+                    label: s.aboutUs,
                     onTap: () => Navigator.of(context).pop(),
                   ),
 
@@ -213,7 +219,7 @@ class AppDrawer extends ConsumerWidget {
                     ),
                     _DrawerItem(
                       icon: Icons.logout_rounded,
-                      label: 'Log out',
+                      label: s.logout,
                       color: AppColors.error,
                       onTap: () {
                         Navigator.of(context).pop();
