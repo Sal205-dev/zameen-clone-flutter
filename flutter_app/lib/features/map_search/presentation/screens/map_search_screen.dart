@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -170,10 +171,14 @@ class _MapSearchScreenState extends ConsumerState<MapSearchScreen> {
                     children: [
                       const Icon(Icons.radio_button_checked_rounded, color: AppColors.primary, size: 16),
                       const SizedBox(width: 8),
-                      Text('Search radius: ${_radiusKm.toStringAsFixed(0)} km',
+                      Text('map_search_radius'.tr(namedArgs: {
+                            'km': _radiusKm.toStringAsFixed(0)
+                          }),
                           style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                       const Spacer(),
-                      Text('${_hasSearched ? _results.length : all.length} found',
+                      Text('count_found'.tr(namedArgs: {
+                            'count': '${_hasSearched ? _results.length : all.length}'
+                          }),
                           style: const TextStyle(fontSize: 13, color: AppColors.primary, fontWeight: FontWeight.w600)),
                     ],
                   ),
@@ -192,7 +197,7 @@ class _MapSearchScreenState extends ConsumerState<MapSearchScreen> {
                     child: ElevatedButton.icon(
                       onPressed: _runSearch,
                       icon: const Icon(Icons.search_rounded, size: 18),
-                      label: const Text('Search this area'),
+                      label: Text('btn_search_area'.tr()),
                     ),
                   ),
                 ],
@@ -221,14 +226,14 @@ class _MapTitle extends StatelessWidget {
   const _MapTitle();
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.map_rounded, color: AppColors.primary, size: 18),
-          SizedBox(width: 6),
-          Text('Map search', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+          const Icon(Icons.map_rounded, color: AppColors.primary, size: 18),
+          const SizedBox(width: 6),
+          Text('map_search_title'.tr(), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
         ],
       ),
     );

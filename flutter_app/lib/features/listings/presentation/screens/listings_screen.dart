@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -103,7 +104,7 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
 
-            SliverToBoxAdapter(child: _buildHeader(user?.username ?? 'Guest')),
+            SliverToBoxAdapter(child: _buildHeader(user?.username ?? 'common_guest'.tr())),
 
             // ── Filter card ───────────────────────────────────────────
             SliverToBoxAdapter(
@@ -117,33 +118,33 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
                     Row(
                       children: [
                         _FilterChip(
-                          label: 'City', value: _city,
+                          label: 'filter_city'.tr(), value: _city,
                           active: _city != null, enabled: true,
                           onTap: () => _showPicker(
-                            title: 'Select City', items: dhaCities,
+                            title: 'filter_select_city'.tr(), items: dhaCities,
                             current: _city, onSelect: _selectCity),
                         ),
                         const SizedBox(width: 8),
                         _FilterChip(
-                          label: 'Phase', value: _phase,
+                          label: 'filter_phase'.tr(), value: _phase,
                           active: _phase != null, enabled: _city != null,
                           onTap: _city == null ? null : () => _showPicker(
-                            title: 'Select Phase',
+                            title: 'filter_select_phase'.tr(),
                             items: getPhasesForCity(_city!),
                             current: _phase, onSelect: _selectPhase),
                         ),
                         const SizedBox(width: 8),
                         _FilterChip(
-                          label: 'Sector', value: _sector,
+                          label: 'filter_sector'.tr(), value: _sector,
                           active: _sector != null, enabled: _phase != null,
                           onTap: _phase == null ? null : () => _showPicker(
-                            title: 'Select Sector',
+                            title: 'filter_select_sector'.tr(),
                             items: getSectorsForPhase(_city!, _phase!),
                             current: _sector, onSelect: _selectSector),
                         ),
                         const SizedBox(width: 8),
                         _FilterChip(
-                          label: 'Type',
+                          label: 'filter_type'.tr(),
                           value: _category == null ? null : _catLabel(_category!),
                           active: _category != null, enabled: _sector != null,
                           onTap: _sector == null ? null : _showCategoryPicker,
@@ -175,8 +176,8 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
                                 color: AppColors.error.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Text('Clear',
-                                  style: TextStyle(
+                              child: Text('btn_clear'.tr(),
+                                  style: const TextStyle(
                                       fontSize: 12,
                                       color: AppColors.error,
                                       fontWeight: FontWeight.w600)),
@@ -201,8 +202,8 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
                     if (!showingFiltered) ...[
                       const Text('🔥', style: TextStyle(fontSize: 18)),
                       const SizedBox(width: 8),
-                      const Text('Hottest Listings',
-                          style: TextStyle(
+                      Text('hottest_listings'.tr(),
+                          style: const TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary)),
@@ -211,8 +212,12 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
                           size: 18, color: AppColors.primary),
                       const SizedBox(width: 8),
                       Text(
-                        '${displayProperties.length} '
-                        '${displayProperties.length == 1 ? 'result' : 'results'} found',
+                        (displayProperties.length == 1
+                                ? 'results_found_one'
+                                : 'results_found_other')
+                            .tr(namedArgs: {
+                          'count': '${displayProperties.length}'
+                        }),
                         style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
@@ -228,7 +233,9 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
                       )
                     else
                       Text(
-                        '${displayProperties.length} total',
+                        'total_count'.tr(namedArgs: {
+                          'count': '${displayProperties.length}'
+                        }),
                         style: const TextStyle(
                             fontSize: 12, color: AppColors.textSecondary),
                       ),
@@ -324,7 +331,9 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
 
   String _breadcrumb() {
     final parts = <String>[];
-    if (_purpose != null) parts.add(_purpose == 'sale' ? 'Buy' : 'Rent');
+    if (_purpose != null) {
+      parts.add(_purpose == 'sale' ? 'purpose_buy'.tr() : 'purpose_rent'.tr());
+    }
     if (_city != null)     parts.add(_city!);
     if (_phase != null)    parts.add(_phase!);
     if (_sector != null)   parts.add(_sector!);
@@ -334,18 +343,18 @@ class _ListingsScreenState extends ConsumerState<ListingsScreen> {
 
   String _catLabel(String cat) {
     switch (cat) {
-      case 'property':   return 'House/Flat';
-      case 'plot':       return 'Plot';
-      case 'commercial': return 'Commercial';
+      case 'property':   return 'type_house_flat'.tr();
+      case 'plot':       return 'type_plot'.tr();
+      case 'commercial': return 'type_commercial'.tr();
       default:           return cat;
     }
   }
 
   String _greeting() {
     final h = DateTime.now().hour;
-    if (h < 12) return 'Good morning,';
-    if (h < 17) return 'Good afternoon,';
-    return 'Good evening,';
+    if (h < 12) return 'greeting_morning'.tr();
+    if (h < 17) return 'greeting_afternoon'.tr();
+    return 'greeting_evening'.tr();
   }
 }
 
@@ -364,9 +373,9 @@ class _BuyRentToggle extends StatelessWidget {
       padding: const EdgeInsets.all(3),
       child: Row(
         children: [
-          _Pill(label: 'Buy',  active: selected == 'sale',
+          _Pill(label: 'purpose_buy'.tr(),  active: selected == 'sale',
               onTap: () => onChanged('sale')),
-          _Pill(label: 'Rent', active: selected == 'rent',
+          _Pill(label: 'purpose_rent'.tr(), active: selected == 'rent',
               onTap: () => onChanged('rent')),
         ],
       ),
@@ -499,9 +508,9 @@ class _PickerSheetState extends State<_PickerSheet> {
           if (widget.items.length > 6)
             Padding(padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: TextField(autofocus: false,
-                decoration: const InputDecoration(hintText: 'Search...',
-                  prefixIcon: Icon(Icons.search_rounded, size: 20),
-                  contentPadding: EdgeInsets.symmetric(vertical: 10),
+                decoration: InputDecoration(hintText: 'common_search_hint'.tr(),
+                  prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
                   isDense: true, fillColor: AppColors.background),
                 onChanged: (v) => setState(() => _q = v))),
           Flexible(child: ListView.builder(
@@ -529,10 +538,13 @@ class _CategoryPickerSheet extends StatelessWidget {
   final String? current;
   final ValueChanged<String> onSelect;
   const _CategoryPickerSheet({required this.current, required this.onSelect});
+  // Third/fourth tuple items are translation keys, resolved via .tr() at
+  // render time (not pre-translated here — this list is a compile-time
+  // const, but the current locale is only known at build()).
   static const _cats = [
-    ('property',   Icons.home_rounded,      'House / Flat',   'Residential built properties'),
-    ('plot',       Icons.landscape_rounded,  'Plot',           'Empty land plots'),
-    ('commercial', Icons.store_rounded,      'Commercial',     'Offices, shops & retail'),
+    ('property',   Icons.home_rounded,      'type_house_flat',  'cat_property_desc'),
+    ('plot',       Icons.landscape_rounded, 'type_plot',         'cat_plot_desc'),
+    ('commercial', Icons.store_rounded,     'type_commercial',   'cat_commercial_desc'),
   ];
   @override
   Widget build(BuildContext context) {
@@ -547,8 +559,8 @@ class _CategoryPickerSheet extends StatelessWidget {
               margin: const EdgeInsets.only(top: 12, bottom: 20),
               decoration: BoxDecoration(color: AppColors.divider,
                   borderRadius: BorderRadius.circular(2))),
-          const Align(alignment: Alignment.centerLeft,
-            child: Text('Select Property Type', style: TextStyle(
+          Align(alignment: Alignment.centerLeft,
+            child: Text('select_property_type'.tr(), style: const TextStyle(
                 fontSize: 16, fontWeight: FontWeight.w700))),
           const SizedBox(height: 16),
           ..._cats.map((r) {
@@ -576,10 +588,10 @@ class _CategoryPickerSheet extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(r.$3, style: TextStyle(fontSize: 14,
+                      Text(r.$3.tr(), style: TextStyle(fontSize: 14,
                           fontWeight: sel ? FontWeight.w600 : FontWeight.w500,
                           color: sel ? AppColors.primary : AppColors.textPrimary)),
-                      Text(r.$4, style: const TextStyle(
+                      Text(r.$4.tr(), style: const TextStyle(
                           fontSize: 12, color: AppColors.textSecondary)),
                     ])),
                   if (sel) const Icon(Icons.check_circle_rounded,
@@ -605,13 +617,13 @@ class _EmptyResultsState extends StatelessWidget {
         children: [
           const Icon(Icons.search_off_rounded, size: 48, color: AppColors.textHint),
           const SizedBox(height: 12),
-          const Text('No listings found',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+          Text('empty_no_listings'.tr(),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
-          const Text('Try a different phase or sector',
-              style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+          Text('empty_try_different'.tr(),
+              style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
           const SizedBox(height: 16),
-          TextButton(onPressed: onReset, child: const Text('Reset search')),
+          TextButton(onPressed: onReset, child: Text('btn_reset_search'.tr())),
         ],
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -17,14 +18,14 @@ class PasswordStrength {
 
   factory PasswordStrength.of(String password) {
     final reqs = [
-      PasswordRequirement('At least 8 characters', password.length >= 8),
-      PasswordRequirement('Uppercase letter (A-Z)',
+      PasswordRequirement('pw_req_length'.tr(), password.length >= 8),
+      PasswordRequirement('pw_req_uppercase'.tr(),
           password.contains(RegExp(r'[A-Z]'))),
-      PasswordRequirement('Lowercase letter (a-z)',
+      PasswordRequirement('pw_req_lowercase'.tr(),
           password.contains(RegExp(r'[a-z]'))),
-      PasswordRequirement('Number (0-9)',
+      PasswordRequirement('pw_req_number'.tr(),
           password.contains(RegExp(r'[0-9]'))),
-      PasswordRequirement('Special character (!@#\$...)',
+      PasswordRequirement('pw_req_special'.tr(),
           password.contains(RegExp(
               r'[!@#\$%^&*(),.?":{}|<>_\-+=\[\]\\;' "'" r'`~]'))),
     ];
@@ -37,11 +38,11 @@ class PasswordStrength {
     }
 
     final (label, color) = switch (score) {
-      0 || 1 => ('Weak',        const Color(0xFFE53935)),
-      2       => ('Fair',        const Color(0xFFFF9800)),
-      3       => ('Good',        const Color(0xFFFFD600)),
-      4       => ('Strong',      const Color(0xFF43A047)),
-      _       => ('Very strong', const Color(0xFF1B5E20)),
+      0 || 1 => ('pw_strength_weak'.tr(),        const Color(0xFFE53935)),
+      2       => ('pw_strength_fair'.tr(),        const Color(0xFFFF9800)),
+      3       => ('pw_strength_good'.tr(),        const Color(0xFFFFD600)),
+      4       => ('pw_strength_strong'.tr(),      const Color(0xFF43A047)),
+      _       => ('pw_strength_very_strong'.tr(), const Color(0xFF1B5E20)),
     };
 
     return PasswordStrength._(

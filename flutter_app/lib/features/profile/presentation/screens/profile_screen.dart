@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -56,7 +57,7 @@ class ProfileScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
                     ),
-                    child: Text(user.isAgent ? 'Agent / Owner' : 'Buyer / Renter',
+                    child: Text(user.isAgent ? 'role_agent_owner'.tr() : 'role_buyer_renter'.tr(),
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Colors.white)),
                   ),
                 ],
@@ -89,12 +90,12 @@ class ProfileScreen extends ConsumerWidget {
                               child: const Icon(Icons.add_home_outlined, color: Colors.white, size: 22),
                             ),
                             const SizedBox(width: 14),
-                            const Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Post a property', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
-                                  Text('List your property for sale or rent', style: TextStyle(fontSize: 12, color: Colors.white70)),
+                                  Text('title_post_property'.tr(), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)),
+                                  Text('post_property_subtitle'.tr(), style: const TextStyle(fontSize: 12, color: Colors.white70)),
                                 ],
                               ),
                             ),
@@ -104,7 +105,7 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    const Text('My listings', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    Text('my_listings_title'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 4),
                     const _MyListings(),
                     const SizedBox(height: 16),
@@ -116,19 +117,19 @@ class ProfileScreen extends ConsumerWidget {
                         boxShadow: const [BoxShadow(color: Color(0x08000000), blurRadius: 8)]),
                     child: Column(
                       children: [
-                        _SettingsTile(icon: Icons.person_outline_rounded, label: 'Edit profile', onTap: () {
+                        _SettingsTile(icon: Icons.person_outline_rounded, label: 'settings_edit_profile'.tr(), onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
                             builder: (_) => const EditProfileScreen(),
                           ));
                         }),
                         const Divider(height: 0, indent: 54),
-                        _SettingsTile(icon: Icons.notifications_outlined, label: 'Notifications', onTap: () {}),
+                        _SettingsTile(icon: Icons.notifications_outlined, label: 'settings_notifications'.tr(), onTap: () {}),
                         const Divider(height: 0, indent: 54),
-                        _SettingsTile(icon: Icons.help_outline_rounded, label: 'Help & support', onTap: () {}),
+                        _SettingsTile(icon: Icons.help_outline_rounded, label: 'settings_help_support'.tr(), onTap: () {}),
                         const Divider(height: 0, indent: 54),
                         _SettingsTile(
                           icon: Icons.logout_rounded,
-                          label: 'Log out',
+                          label: 'logout'.tr(),
                           color: AppColors.error,
                           onTap: () => _confirmLogout(context, ref),
                         ),
@@ -150,10 +151,10 @@ class ProfileScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Log out?'),
-        content: const Text("You'll need to log in again to access your account."),
+        title: Text('confirm_logout_title'.tr()),
+        content: Text('confirm_logout_body'.tr()),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text('btn_cancel'.tr())),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
@@ -161,7 +162,7 @@ class ProfileScreen extends ConsumerWidget {
               ref.read(myListingIdsProvider.notifier).clear();
               ref.read(authNotifierProvider.notifier).logout();
             },
-            child: const Text('Log out', style: TextStyle(color: AppColors.error)),
+            child: Text('logout'.tr(), style: const TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -208,10 +209,10 @@ class _MyListings extends ConsumerWidget {
         padding: EdgeInsets.all(16),
         child: Center(child: CircularProgressIndicator()),
       ),
-      error: (_, __) => const Padding(
-        padding: EdgeInsets.symmetric(vertical: 12),
-        child: Text('Could not load listings',
-            style: TextStyle(color: AppColors.textSecondary)),
+      error: (_, __) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Text('error_could_not_load_listings'.tr(),
+            style: const TextStyle(color: AppColors.textSecondary)),
       ),
       data: (properties) {
         if (properties.isEmpty) {
@@ -223,12 +224,12 @@ class _MyListings extends ConsumerWidget {
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: AppColors.divider)),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.home_outlined, color: AppColors.textHint),
-                  SizedBox(width: 12),
-                  Text("You haven't posted any properties yet",
-                      style: TextStyle(
+                  const Icon(Icons.home_outlined, color: AppColors.textHint),
+                  const SizedBox(width: 12),
+                  Text('empty_no_listings_posted'.tr(),
+                      style: const TextStyle(
                           fontSize: 13, color: AppColors.textSecondary)),
                 ],
               ),
@@ -256,18 +257,18 @@ class _MyListings extends ConsumerWidget {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16)),
-        title: const Text('Delete listing?'),
+        title: Text('confirm_delete_listing_title'.tr()),
         content: Text(
-          '"${p.title}" will be permanently removed from the database.',
+          'confirm_delete_listing_body'.tr(namedArgs: {'title': p.title}),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel')),
+              child: Text('btn_cancel'.tr())),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete',
-                style: TextStyle(color: AppColors.error)),
+            child: Text('btn_delete'.tr(),
+                style: const TextStyle(color: AppColors.error)),
           ),
         ],
       ),
@@ -282,7 +283,7 @@ class _MyListings extends ConsumerWidget {
       ref.invalidate(apiPropertiesProvider);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: const Text('Listing deleted'),
+          content: Text('listing_deleted_success'.tr()),
           backgroundColor: AppColors.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -343,23 +344,23 @@ class _MyListingCard extends StatelessWidget {
               if (value == 'delete') onDelete();
             },
             itemBuilder: (_) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'edit',
                 child: Row(children: [
-                  Icon(Icons.edit_outlined,
+                  const Icon(Icons.edit_outlined,
                       size: 18, color: AppColors.primary),
-                  SizedBox(width: 10),
-                  Text('Edit listing'),
+                  const SizedBox(width: 10),
+                  Text('title_edit_listing'.tr()),
                 ]),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'delete',
                 child: Row(children: [
-                  Icon(Icons.delete_outline_rounded,
+                  const Icon(Icons.delete_outline_rounded,
                       size: 18, color: AppColors.error),
-                  SizedBox(width: 10),
-                  Text('Delete',
-                      style: TextStyle(color: AppColors.error)),
+                  const SizedBox(width: 10),
+                  Text('btn_delete'.tr(),
+                      style: const TextStyle(color: AppColors.error)),
                 ]),
               ),
             ],

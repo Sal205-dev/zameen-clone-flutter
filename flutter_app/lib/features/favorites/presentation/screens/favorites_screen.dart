@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,14 +16,14 @@ class FavoritesScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Saved properties'),
+        title: Text('saved_properties_title'.tr()),
         actions: [
           if (favorites.isNotEmpty)
             TextButton(
               onPressed: () {
                 for (final p in favorites) { ref.read(favoritesProvider.notifier).toggle(p.id); }
               },
-              child: const Text('Clear all', style: TextStyle(color: AppColors.error, fontSize: 13)),
+              child: Text('btn_clear_all'.tr(), style: const TextStyle(color: AppColors.error, fontSize: 13)),
             ),
         ],
       ),
@@ -38,9 +39,9 @@ class FavoritesScreen extends ConsumerWidget {
                     child: Icon(Icons.favorite_border_rounded, size: 36, color: Colors.red.shade300),
                   ),
                   const SizedBox(height: 16),
-                  const Text('No saved properties', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  Text('empty_no_favorites'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 6),
-                  const Text('Tap the heart on any listing to save it', style: TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                  Text('empty_favorites_hint'.tr(), style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
                 ],
               ),
             )

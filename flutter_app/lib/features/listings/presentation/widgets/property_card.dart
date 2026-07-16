@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../domain/property_model.dart';
@@ -159,12 +160,12 @@ class PropertyCard extends StatelessWidget {
                       children: [
                         if (property.beds != null) ...[
                           _Stat(icon: Icons.bed_rounded,
-                              label: '${property.beds} bed'),
+                              label: '${property.beds} ${'unit_bed'.tr()}'),
                           const SizedBox(width: 14),
                         ],
                         if (property.baths != null) ...[
                           _Stat(icon: Icons.bathtub_rounded,
-                              label: '${property.baths} bath'),
+                              label: '${property.baths} ${'unit_bath'.tr()}'),
                           const SizedBox(width: 14),
                         ],
                         _Stat(
@@ -178,7 +179,7 @@ class PropertyCard extends StatelessWidget {
                           decoration: BoxDecoration(
                               color: AppColors.primarySurface,
                               borderRadius: BorderRadius.circular(6)),
-                          child: Text(property.propertyType,
+                          child: Text(property.propertyTypeLabel,
                               style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,
@@ -253,7 +254,7 @@ class PropertyCard extends StatelessWidget {
           Icon(_typeIcon(property.propertyType),
               size: 36, color: Colors.white.withValues(alpha: 0.6)),
           const SizedBox(height: 6),
-          Text(property.propertyType,
+          Text(property.propertyTypeLabel,
               style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.5),
                   fontSize: 11,
@@ -287,7 +288,7 @@ class _PurposeBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(7),
       ),
       child: Text(
-        isRent ? 'For rent' : 'For sale',
+        isRent ? 'badge_for_rent'.tr() : 'badge_for_sale'.tr(),
         style: const TextStyle(
             color: Colors.white,
             fontSize: 11,

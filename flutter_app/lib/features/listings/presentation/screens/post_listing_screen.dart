@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -91,7 +92,7 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
   // ── Location pickers ──────────────────────────────────────────────
   Future<void> _pickCity() async {
     final chosen = await _showPicker(
-        title: 'Select City', items: dhaCities, current: _city);
+        title: 'filter_select_city'.tr(), items: dhaCities, current: _city);
     if (chosen != null) {
       setState(() { _city = chosen; _phase = null; _sector = null; });
     }
@@ -100,7 +101,7 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
   Future<void> _pickPhase() async {
     if (_city == null) return;
     final chosen = await _showPicker(
-        title: 'Select Phase — $_city',
+        title: 'select_phase_for'.tr(namedArgs: {'city': _city!}),
         items: getPhasesForCity(_city!),
         current: _phase);
     if (chosen != null) setState(() { _phase = chosen; _sector = null; });
@@ -109,7 +110,7 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
   Future<void> _pickSector() async {
     if (_city == null || _phase == null) return;
     final chosen = await _showPicker(
-        title: 'Select Sector — $_phase',
+        title: 'select_sector_for'.tr(namedArgs: {'phase': _phase!}),
         items: getSectorsForPhase(_city!, _phase!),
         current: _sector);
     if (chosen != null) setState(() => _sector = chosen);
@@ -132,8 +133,8 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
   Future<void> _pickImages() async {
     final remaining = 10 - _pickedImages.length;
     if (remaining <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Maximum 10 photos already added')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('max_photos_reached'.tr())));
       return;
     }
     final images = await ImagePicker().pickMultiImage(limit: remaining);
@@ -150,9 +151,9 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
     // Check 25 MB limit before uploading
     final bytes = await File(video.path).length();
     if (bytes > 25 * 1024 * 1024) {
-      setState(() => _videoError =
-          'Video exceeds 25 MB (${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB). '
-          'Please pick a smaller file.');
+      setState(() => _videoError = 'video_exceeds_size'.tr(namedArgs: {
+            'size': (bytes / (1024 * 1024)).toStringAsFixed(1),
+          }));
       return;
     }
     setState(() => _pickedVideo = video);
@@ -160,12 +161,22 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
 
   void _removeVideo() => setState(() => _pickedVideo = null);
 
+  String _propertyTypeLabel(String type) {
+    switch (type) {
+      case 'house':       return 'type_house'.tr();
+      case 'flat':        return 'type_flat'.tr();
+      case 'plot':        return 'type_plot'.tr();
+      case 'commercial':  return 'type_commercial'.tr();
+      default:            return type;
+    }
+  }
+
   // ── Submit ────────────────────────────────────────────────────────
   Future<void> _submit() async {
     setState(() => _errorMessage = null);
     if (!_formKey.currentState!.validate()) return;
     if (_city == null || _phase == null || _sector == null) {
-      setState(() => _errorMessage = 'Please select City, Phase and Sector.');
+      setState(() => _errorMessage = 'error_select_location'.tr());
       return;
     }
     if (_videoError != null) {
@@ -212,7 +223,7 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
           } catch (e) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Video: $e'),
+                SnackBar(content: Text('video_error_prefix'.tr(namedArgs: {'error': '$e'})),
                     backgroundColor: AppColors.error,
                     behavior: SnackBarBehavior.floating),
               );
@@ -255,7 +266,7 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
           } catch (e) {
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Video: $e'),
+                SnackBar(content: Text('video_error_prefix'.tr(namedArgs: {'error': '$e'})),
                     backgroundColor: AppColors.error,
                     behavior: SnackBarBehavior.floating),
               );
@@ -271,8 +282,8 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(widget.isEditMode
-              ? 'Listing updated successfully'
-              : 'Property listed successfully'),
+              ? 'listing_updated_success'.tr()
+              : 'listing_posted_success'.tr()),
           backgroundColor: AppColors.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -281,7 +292,7 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
         context.pop();
       }
     } on DioException catch (e) {
-      String msg = 'Failed to save listing.';
+      String msg = 'error_save_listing_failed'.tr();
       final data = e.response?.data;
       if (data is Map) {
         for (final v in data.values) {
@@ -295,7 +306,7 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
         setState(() => _errorMessage =
             e.toString().startsWith('Exception:')
                 ? e.toString().replaceFirst('Exception: ', '')
-                : 'Could not connect to server. Is it running?');
+                : 'error_connection'.tr());
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -307,7 +318,9 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(widget.isEditMode ? 'Edit listing' : 'Post a property'),
+        title: Text(widget.isEditMode
+            ? 'title_edit_listing'.tr()
+            : 'title_post_property'.tr()),
       ),
       body: SafeArea(
         child: Form(
@@ -317,7 +330,7 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
             children: [
 
               // ── Photos (up to 10) ──────────────────────────────────
-              const _SectionLabel('Photos (up to 10)'),
+              _SectionLabel('section_photos'.tr()),
               _PhotoPicker(
                   images: _pickedImages,
                   existingUrls: widget.editProperty?.imageUrls ?? [],
@@ -327,7 +340,7 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
               const SizedBox(height: 16),
 
               // ── Video (1, max 25 MB) ───────────────────────────────
-              const _SectionLabel('Video (1 video, max 25 MB)'),
+              _SectionLabel('section_video'.tr()),
               _VideoPickerTile(
                 pickedVideo: _pickedVideo,
                 existingVideoUrl: widget.editProperty?.videoUrl,
@@ -338,58 +351,61 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
               const SizedBox(height: 24),
 
               // ── DHA Location ───────────────────────────────────────
-              const _SectionLabel('DHA Location'),
-              const Text(
-                'Select the exact DHA location for your property.',
-                style: TextStyle(
+              _SectionLabel('section_dha_location'.tr()),
+              Text(
+                'dha_location_hint'.tr(),
+                style: const TextStyle(
                     fontSize: 12, color: AppColors.textSecondary),
               ),
               const SizedBox(height: 12),
               _LocationPickerTile(
-                  step: '1', label: 'City', value: _city,
-                  placeholder: 'Select city', enabled: true,
+                  step: '1', label: 'filter_city'.tr(), value: _city,
+                  placeholder: 'placeholder_select_city'.tr(), enabled: true,
                   onTap: _pickCity),
               const SizedBox(height: 10),
               _LocationPickerTile(
-                  step: '2', label: 'Phase', value: _phase,
-                  placeholder: _city == null ? 'Select city first' : 'Select phase',
+                  step: '2', label: 'filter_phase'.tr(), value: _phase,
+                  placeholder: _city == null
+                      ? 'placeholder_select_city_first'.tr()
+                      : 'placeholder_select_phase'.tr(),
                   enabled: _city != null,
                   onTap: _city != null ? _pickPhase : null),
               const SizedBox(height: 10),
               _LocationPickerTile(
-                  step: '3', label: 'Sector', value: _sector,
-                  placeholder: _phase == null ? 'Select phase first' : 'Select sector',
+                  step: '3', label: 'filter_sector'.tr(), value: _sector,
+                  placeholder: _phase == null
+                      ? 'placeholder_select_phase_first'.tr()
+                      : 'placeholder_select_sector'.tr(),
                   enabled: _phase != null,
                   onTap: _phase != null ? _pickSector : null),
               const SizedBox(height: 24),
 
               // ── Basic info ─────────────────────────────────────────
-              const _SectionLabel('Basic info'),
+              _SectionLabel('section_basic_info'.tr()),
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
+                decoration: InputDecoration(labelText: 'field_title'.tr()),
                 validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Title is required' : null,
+                    (v == null || v.isEmpty) ? 'error_title_required'.tr() : null,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 4,
-                decoration: const InputDecoration(
-                    labelText: 'Description (optional)'),
+                decoration: InputDecoration(
+                    labelText: 'field_description_optional'.tr()),
               ),
               const SizedBox(height: 12),
               Row(children: [
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     initialValue: _propertyType,
-                    decoration: const InputDecoration(
-                        labelText: 'Property type'),
+                    decoration: InputDecoration(
+                        labelText: 'field_property_type'.tr()),
                     items: _propertyTypes
                         .map((t) => DropdownMenuItem(
                             value: t,
-                            child: Text(
-                                t[0].toUpperCase() + t.substring(1))))
+                            child: Text(_propertyTypeLabel(t))))
                         .toList(),
                     onChanged: (v) => setState(() => _propertyType = v!),
                   ),
@@ -399,10 +415,10 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
                   child: DropdownButtonFormField<String>(
                     initialValue: _purpose,
                     decoration:
-                        const InputDecoration(labelText: 'Purpose'),
-                    items: const [
-                      DropdownMenuItem(value: 'sale', child: Text('For sale')),
-                      DropdownMenuItem(value: 'rent', child: Text('For rent')),
+                        InputDecoration(labelText: 'field_purpose'.tr()),
+                    items: [
+                      DropdownMenuItem(value: 'sale', child: Text('badge_for_sale'.tr())),
+                      DropdownMenuItem(value: 'rent', child: Text('badge_for_rent'.tr())),
                     ],
                     onChanged: (v) => setState(() => _purpose = v!),
                   ),
@@ -411,16 +427,16 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
               const SizedBox(height: 24),
 
               // ── Price & size ───────────────────────────────────────
-              const _SectionLabel('Price & size'),
+              _SectionLabel('section_price_size'.tr()),
               TextFormField(
                 controller: _priceController,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 decoration:
-                    const InputDecoration(labelText: 'Price (PKR)'),
+                    InputDecoration(labelText: 'field_price_pkr'.tr()),
                 validator: (v) =>
                     (v == null || double.tryParse(v) == null)
-                        ? 'Enter a valid price'
+                        ? 'error_valid_price'.tr()
                         : null,
               ),
               const SizedBox(height: 12),
@@ -432,16 +448,16 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
                     keyboardType:
                         const TextInputType.numberWithOptions(decimal: true),
                     decoration:
-                        const InputDecoration(labelText: 'Area size'),
+                        InputDecoration(labelText: 'field_area_size'.tr()),
                     validator: (v) =>
-                        (v == null || v.isEmpty) ? 'Required' : null,
+                        (v == null || v.isEmpty) ? 'error_required'.tr() : null,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: DropdownButtonFormField<String>(
                     initialValue: _areaUnit,
-                    decoration: const InputDecoration(labelText: 'Unit'),
+                    decoration: InputDecoration(labelText: 'field_unit'.tr()),
                     items: _areaUnits
                         .map((u) => DropdownMenuItem(
                             value: u, child: Text(u)))
@@ -456,8 +472,8 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
                   child: TextFormField(
                     controller: _bedsController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                        labelText: 'Bedrooms (optional)'),
+                    decoration: InputDecoration(
+                        labelText: 'field_bedrooms_optional'.tr()),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -465,8 +481,8 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
                   child: TextFormField(
                     controller: _bathsController,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                        labelText: 'Bathrooms (optional)'),
+                    decoration: InputDecoration(
+                        labelText: 'field_bathrooms_optional'.tr()),
                   ),
                 ),
               ]),
@@ -512,8 +528,8 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
                         child: CircularProgressIndicator(
                             strokeWidth: 2, color: Colors.white))
                     : Text(widget.isEditMode
-                        ? 'Save changes'
-                        : 'Post listing'),
+                        ? 'btn_save_changes'.tr()
+                        : 'btn_post_listing'.tr()),
               ),
               const SizedBox(height: 32),
             ],
@@ -579,7 +595,7 @@ class _VideoPickerTile extends StatelessWidget {
                         child: Text(
                           pickedVideo != null
                               ? pickedVideo!.name
-                              : 'Existing video attached',
+                              : 'existing_video_attached'.tr(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -592,18 +608,18 @@ class _VideoPickerTile extends StatelessWidget {
                         icon: const Icon(Icons.close_rounded,
                             color: AppColors.error, size: 20),
                         onPressed: onRemove,
-                        tooltip: 'Remove video',
+                        tooltip: 'tooltip_remove_video'.tr(),
                       ),
                     ],
                   )
-                : const Row(
+                : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.add_circle_outline_rounded,
+                      const Icon(Icons.add_circle_outline_rounded,
                           color: AppColors.textSecondary, size: 20),
-                      SizedBox(width: 8),
-                      Text('Add video (max 25 MB)',
-                          style: TextStyle(
+                      const SizedBox(width: 8),
+                      Text('add_video_hint'.tr(),
+                          style: const TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 13)),
                     ],
@@ -685,8 +701,8 @@ class _PhotoPicker extends StatelessWidget {
                             color: AppColors.primary,
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: const Text('Cover',
-                              style: TextStyle(
+                          child: Text('badge_cover'.tr(),
+                              style: const TextStyle(
                                   color: Colors.white, fontSize: 9)),
                         ),
                       ),
@@ -844,10 +860,10 @@ class _PickerSheetState extends State<_PickerSheet> {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: TextField(
                 autofocus: false,
-                decoration: const InputDecoration(
-                  hintText: 'Search...',
-                  prefixIcon: Icon(Icons.search_rounded, size: 20),
-                  contentPadding: EdgeInsets.symmetric(vertical: 10),
+                decoration: InputDecoration(
+                  hintText: 'common_search_hint'.tr(),
+                  prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
                   isDense: true,
                   fillColor: AppColors.background,
                 ),

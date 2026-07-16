@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../domain/property_filter.dart';
 import '../domain/property_model.dart';
 /// Handles all real network calls for properties.
@@ -106,7 +107,7 @@ class PropertyApiRepository {
           if (v is String) throw v;
         }
       }
-      throw 'Video upload failed.';
+      throw 'error_video_upload_failed'.tr();
     }
   }
 
@@ -181,11 +182,11 @@ class PropertyApiRepository {
       if (data.containsKey('detail')) return data['detail'].toString();
     }
     switch (e.response?.statusCode) {
-      case 400: return 'Invalid details.';
-      case 401: return 'Not authorised.';
-      case 403: return 'You cannot modify this listing.';
-      case 404: return 'Listing not found.';
-      default:  return 'Could not connect to server.';
+      case 400: return 'error_invalid_details_short'.tr();
+      case 401: return 'error_not_authorised'.tr();
+      case 403: return 'error_cannot_modify_listing'.tr();
+      case 404: return 'error_listing_not_found'.tr();
+      default:  return 'error_connection_short'.tr();
     }
   }
 }

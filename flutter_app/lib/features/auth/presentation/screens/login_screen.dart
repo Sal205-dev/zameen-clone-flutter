@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -71,7 +72,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final cameFromLoading = previous?.isLoading ?? false;
 
       if (next.hasError && cameFromLoading) {
-        String message = next.error?.toString() ?? 'Login failed.';
+        String message = next.error?.toString() ?? 'error_login_failed'.tr();
         if (message.startsWith('Exception: ')) {
           message = message.replaceFirst('Exception: ', '');
         }
@@ -113,14 +114,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     const Icon(Icons.location_city_rounded,
                         color: Colors.white, size: 36),
                     const SizedBox(height: 20),
-                    const Text('Welcome back',
-                        style: TextStyle(
+                    Text('auth_welcome_back'.tr(),
+                        style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                             letterSpacing: -0.5)),
                     const SizedBox(height: 6),
-                    Text('Sign in to continue exploring properties',
+                    Text('auth_signin_subtitle'.tr(),
                         style: TextStyle(
                             fontSize: 14,
                             color: Colors.white.withValues(alpha: 0.75))),
@@ -143,14 +144,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         controller: _usernameController,
                         textInputAction: TextInputAction.next,
                         onChanged: (_) => _clearError(),
-                        decoration: const InputDecoration(
-                          labelText: 'Username',
-                          prefixIcon: Icon(Icons.person_outline_rounded,
+                        decoration: InputDecoration(
+                          labelText: 'field_username'.tr(),
+                          prefixIcon: const Icon(Icons.person_outline_rounded,
                               size: 20),
                         ),
                         validator: (v) =>
                             (v == null || v.trim().isEmpty)
-                                ? 'Username is required'
+                                ? 'error_username_required'.tr()
                                 : null,
                       ),
                       const SizedBox(height: 16),
@@ -164,7 +165,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         onFieldSubmitted: (_) =>
                             isLoading ? null : _submit(),
                         decoration: InputDecoration(
-                          labelText: 'Password',
+                          labelText: 'field_password'.tr(),
                           prefixIcon: const Icon(Icons.lock_outline_rounded,
                               size: 20),
                           suffixIcon: IconButton(
@@ -180,7 +181,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         validator: (v) =>
                             (v == null || v.isEmpty)
-                                ? 'Password is required'
+                                ? 'error_password_required'.tr()
                                 : null,
                       ),
                       const SizedBox(height: 20),
@@ -235,7 +236,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       color: Colors.white))
-                              : const Text('Log in'),
+                              : Text('btn_login'.tr()),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -247,7 +248,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12),
-                            child: Text('or',
+                            child: Text('common_or'.tr(),
                                 style: TextStyle(
                                     color: Colors.grey.shade500,
                                     fontSize: 13)),
@@ -274,15 +275,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               const Icon(Icons.person_add_alt_1_rounded,
                                   color: AppColors.primary, size: 28),
                               const SizedBox(height: 8),
-                              const Text("Don't have an account?",
-                                  style: TextStyle(
+                              Text('auth_no_account_title'.tr(),
+                                  style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w600)),
                               const SizedBox(height: 4),
-                              const Text(
-                                'If you\'re new here, create a free\naccount to start browsing DHA properties.',
+                              Text(
+                                'auth_no_account_subtitle'.tr(),
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
+                                style: const TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textSecondary),
                               ),
@@ -292,8 +293,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 height: 46,
                                 child: ElevatedButton(
                                   onPressed: _goToSignup,
-                                  child:
-                                      const Text('Create an account'),
+                                  child: Text('btn_create_account'.tr()),
                                 ),
                               ),
                             ],
@@ -305,7 +305,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           height: 52,
                           child: OutlinedButton(
                             onPressed: _goToSignup,
-                            child: const Text('Create an account'),
+                            child: Text('btn_create_account'.tr()),
                           ),
                         ),
                     ],

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/providers.dart';
@@ -70,7 +71,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     // Show "checking" spinner after a short pause while the user types
     setState(() {
       _usernameStatus = 'checking';
-      _usernameMessage = 'Checking availability...';
+      _usernameMessage = 'auth_checking_availability'.tr();
     });
 
     // Debounce: wait 600ms after the user stops typing before hitting the API
@@ -109,8 +110,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     // Block submit if password isn't strong enough
     final strength = PasswordStrength.of(_passwordController.text);
     if (!strength.isAcceptable) {
-      setState(() => _errorMessage =
-          'Password is too weak. Please meet the requirements below.');
+      setState(() => _errorMessage = 'error_password_weak'.tr());
       return;
     }
 
@@ -131,7 +131,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       if (!mounted) return;
       final cameFromLoading = previous?.isLoading ?? false;
       if (next.hasError && cameFromLoading) {
-        String message = next.error?.toString() ?? 'Signup failed.';
+        String message = next.error?.toString() ?? 'error_signup_failed'.tr();
         if (message.startsWith('Exception: ')) {
           message = message.replaceFirst('Exception: ', '');
         }
@@ -180,14 +180,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text('Create account',
-                        style: TextStyle(
+                    Text('auth_create_account_title'.tr(),
+                        style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
                             letterSpacing: -0.5)),
                     const SizedBox(height: 4),
-                    Text('Join thousands finding homes',
+                    Text('auth_join_subtitle'.tr(),
                         style: TextStyle(
                             fontSize: 14,
                             color: Colors.white.withValues(alpha: 0.72))),
@@ -205,8 +205,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       const SizedBox(height: 4),
 
                       // ── Role selector ────────────────────────────
-                      const Text('I am a',
-                          style: TextStyle(
+                      Text('auth_role_prompt'.tr(),
+                          style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
                               color: AppColors.textSecondary)),
@@ -221,12 +221,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         child: Row(
                           children: [
                             _RoleTab(
-                                label: 'Buyer / Renter',
+                                label: 'role_buyer_renter'.tr(),
                                 icon: Icons.search_rounded,
                                 selected: _role == 'buyer',
                                 onTap: () => setState(() => _role = 'buyer')),
                             _RoleTab(
-                                label: 'Agent / Owner',
+                                label: 'role_agent_owner'.tr(),
                                 icon: Icons.home_work_outlined,
                                 selected: _role == 'agent',
                                 onTap: () => setState(() => _role = 'agent')),
@@ -241,18 +241,18 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         textInputAction: TextInputAction.next,
                         onChanged: _onUsernameChanged,
                         decoration: InputDecoration(
-                          labelText: 'Username',
-                          hintText: 'letters, digits, underscores only',
+                          labelText: 'field_username'.tr(),
+                          hintText: 'hint_username_chars'.tr(),
                           prefixIcon: const Icon(
                               Icons.person_outline_rounded, size: 20),
                           suffixIcon: _buildUsernameStatus(),
                         ),
                         validator: (v) {
                           if (v == null || v.trim().isEmpty) {
-                            return 'Username is required';
+                            return 'error_username_required'.tr();
                           }
                           if (v.trim().length < 3) {
-                            return 'Minimum 3 characters';
+                            return 'error_username_min_length'.tr();
                           }
                           if (_usernameStatus == 'taken') {
                             return _usernameMessage;
@@ -288,17 +288,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         onChanged: (_) => _clearError(),
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                          hintText: 'you@gmail.com',
-                          prefixIcon: Icon(Icons.email_outlined, size: 20),
+                        decoration: InputDecoration(
+                          labelText: 'field_email'.tr(),
+                          hintText: 'hint_email_example'.tr(),
+                          prefixIcon: const Icon(Icons.email_outlined, size: 20),
                         ),
                         validator: (v) {
                           if (v == null || v.trim().isEmpty) {
-                            return 'Email is required';
+                            return 'error_email_required'.tr();
                           }
                           if (!_emailRegex.hasMatch(v.trim())) {
-                            return 'Enter a valid email address';
+                            return 'error_email_invalid'.tr();
                           }
                           return null;
                         },
@@ -314,10 +314,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         onChanged: _clearError,
                         validator: (v) {
                           if (v == null || v.trim().isEmpty) {
-                            return 'Phone number is required';
+                            return 'error_phone_required'.tr();
                           }
                           if (v.trim().length < 7) {
-                            return 'Enter a valid phone number';
+                            return 'error_phone_invalid'.tr();
                           }
                           return null;
                         },
@@ -336,7 +336,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         onFieldSubmitted: (_) =>
                             isLoading ? null : _submit(),
                         decoration: InputDecoration(
-                          labelText: 'Password',
+                          labelText: 'field_password'.tr(),
                           prefixIcon: const Icon(
                               Icons.lock_outline_rounded, size: 20),
                           suffixIcon: IconButton(
@@ -352,11 +352,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         ),
                         validator: (v) {
                           if (v == null || v.isEmpty) {
-                            return 'Password is required';
+                            return 'error_password_required'.tr();
                           }
                           final s = PasswordStrength.of(v);
                           if (!s.isAcceptable) {
-                            return 'Password does not meet requirements';
+                            return 'error_password_requirements'.tr();
                           }
                           return null;
                         },
@@ -419,7 +419,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                   child: CircularProgressIndicator(
                                       strokeWidth: 2,
                                       color: Colors.white))
-                              : const Text('Create account'),
+                              : Text('auth_create_account_title'.tr()),
                         ),
                       ),
                       const SizedBox(height: 24),

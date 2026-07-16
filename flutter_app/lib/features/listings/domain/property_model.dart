@@ -1,3 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
+
 class PropertyModel {
   final int id;
   final String title;
@@ -66,6 +68,17 @@ class PropertyModel {
   /// Convenience getter — the area shown on cards and detail screen
   /// is the sector within the phase.
   String get area => sector;
+
+  /// Translated display label for [propertyType] (house/flat/plot/commercial).
+  String get propertyTypeLabel {
+    switch (propertyType) {
+      case 'house':       return 'type_house'.tr();
+      case 'flat':        return 'type_flat'.tr();
+      case 'plot':        return 'type_plot'.tr();
+      case 'commercial':  return 'type_commercial'.tr();
+      default:            return propertyType;
+    }
+  }
 
   String get formattedPrice {
     if (price >= 10000000) {

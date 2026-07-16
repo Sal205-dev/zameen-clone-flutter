@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
@@ -43,13 +44,13 @@ class _PropertyDetailScreenState
       ),
       error: (_, __) => Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Property not found')),
+        body: Center(child: Text('error_property_not_found'.tr())),
       ),
       data: (property) {
         if (property == null) {
           return Scaffold(
             appBar: AppBar(),
-            body: const Center(child: Text('Property not found')),
+            body: Center(child: Text('error_property_not_found'.tr())),
           );
         }
         final isFavorited = favoriteIds.contains(property.id);
@@ -111,7 +112,7 @@ class _PropertyDetailScreenState
                         color: Colors.white, size: 20),
                     onPressed: () =>
                         ScaffoldMessenger.of(context).showSnackBar(
-                      _snackBar('Share (mock)'),
+                      _snackBar('snackbar_share_mock'.tr()),
                     ),
                   ),
                 ),
@@ -133,14 +134,19 @@ class _PropertyDetailScreenState
                   child: Row(
                     children: [
                       Text(
-                        '${_capitalize(property.propertyType)} for ${property.purpose}',
+                        'listing_type_for_purpose'.tr(namedArgs: {
+                          'type': property.propertyTypeLabel,
+                          'purpose': property.purpose == 'rent'
+                              ? 'purpose_word_rent'.tr()
+                              : 'purpose_word_sale'.tr(),
+                        }),
                         style: const TextStyle(
                             fontSize: 13,
                             color: AppColors.textSecondary),
                       ),
                       const Spacer(),
-                      const Text('Just posted',
-                          style: TextStyle(
+                      Text('just_posted'.tr(),
+                          style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.textSecondary)),
                     ],
@@ -186,12 +192,16 @@ class _PropertyDetailScreenState
                           if (property.beds != null)
                             _GreenStat(
                                 icon: Icons.bed_rounded,
-                                label: '${property.beds} Beds'),
+                                label: 'stat_beds'.tr(namedArgs: {
+                                  'count': '${property.beds}'
+                                })),
                           if (property.baths != null) ...[
                             const SizedBox(width: 20),
                             _GreenStat(
                                 icon: Icons.bathtub_rounded,
-                                label: '${property.baths} Baths'),
+                                label: 'stat_baths'.tr(namedArgs: {
+                                  'count': '${property.baths}'
+                                })),
                           ],
                           const SizedBox(width: 20),
                           _GreenStat(
@@ -226,8 +236,8 @@ class _PropertyDetailScreenState
                         GestureDetector(
                           onTap: () => _showFullDescription(
                               context, property.description),
-                          child: const Text('View Full Description',
-                              style: TextStyle(
+                          child: Text('view_full_description'.tr(),
+                              style: const TextStyle(
                                   color: Colors.blue,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500)),
@@ -247,8 +257,8 @@ class _PropertyDetailScreenState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Features & Amenities',
-                            style: TextStyle(
+                        Text('features_amenities'.tr(),
+                            style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary)),
@@ -269,8 +279,8 @@ class _PropertyDetailScreenState
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Property Video',
-                            style: TextStyle(
+                        Text('property_video'.tr(),
+                            style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.textPrimary)),
@@ -363,14 +373,14 @@ class _PropertyDetailScreenState
               icon: Icons.chat_bubble_outline_rounded,
               color: AppColors.primary,
               onTap: () => ScaffoldMessenger.of(context)
-                  .showSnackBar(_snackBar('Chat opened (mock)')),
+                  .showSnackBar(_snackBar('snackbar_chat_opened_mock'.tr())),
             ),
             const SizedBox(width: 8),
             _ActionButton(
               icon: Icons.email_outlined,
               color: AppColors.primary,
               onTap: () => ScaffoldMessenger.of(context)
-                  .showSnackBar(_snackBar('Email opened (mock)')),
+                  .showSnackBar(_snackBar('snackbar_email_opened_mock'.tr())),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -378,9 +388,9 @@ class _PropertyDetailScreenState
                 height: 50,
                 child: ElevatedButton.icon(
                   onPressed: () => ScaffoldMessenger.of(context)
-                      .showSnackBar(_snackBar('Calling agent (mock)')),
+                      .showSnackBar(_snackBar('snackbar_calling_agent_mock'.tr())),
                   icon: const Icon(Icons.call_rounded, size: 18),
-                  label: const Text('Call'),
+                  label: Text('btn_call'.tr()),
                 ),
               ),
             ),
@@ -389,7 +399,7 @@ class _PropertyDetailScreenState
               icon: Icons.chat_rounded,
               color: const Color(0xFF25D366),
               onTap: () => ScaffoldMessenger.of(context)
-                  .showSnackBar(_snackBar('WhatsApp opened (mock)')),
+                  .showSnackBar(_snackBar('snackbar_whatsapp_opened_mock'.tr())),
             ),
           ],
         ),
@@ -518,9 +528,6 @@ class _PropertyDetailScreenState
     }
   }
 
-  String _capitalize(String s) =>
-      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
-
   SnackBar _snackBar(String message) => SnackBar(
         content: Text(message),
         backgroundColor: AppColors.primary,
@@ -553,8 +560,8 @@ class _PropertyDetailScreenState
                     borderRadius: BorderRadius.circular(2)),
               ),
             ),
-            const Text('Description',
-                style: TextStyle(
+            Text('description_title'.tr(),
+                style: const TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w700)),
             const SizedBox(height: 12),
             Text(description,
@@ -722,15 +729,15 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
       return Container(
         height: 180,
         color: Colors.black12,
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.videocam_off_rounded,
+              const Icon(Icons.videocam_off_rounded,
                   color: AppColors.textHint, size: 36),
-              SizedBox(height: 8),
-              Text('Could not load video',
-                  style: TextStyle(color: AppColors.textSecondary)),
+              const SizedBox(height: 8),
+              Text('could_not_load_video'.tr(),
+                  style: const TextStyle(color: AppColors.textSecondary)),
             ],
           ),
         ),

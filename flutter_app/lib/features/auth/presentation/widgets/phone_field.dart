@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -93,7 +94,7 @@ class _PhoneFieldState extends State<PhoneField> {
       textInputAction: TextInputAction.next,
       onChanged: (_) => widget.onChanged?.call(),
       decoration: InputDecoration(
-        labelText: 'Phone number',
+        labelText: 'field_phone'.tr(),
         // The country code prefix lives in prefixIcon so it's part of
         // the standard InputDecoration layout, aligned correctly with the
         // label and the text field border.
@@ -176,12 +177,12 @@ class _CountryPickerSheetState extends State<_CountryPickerSheet> {
                 color: AppColors.divider,
                 borderRadius: BorderRadius.circular(2)),
           ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(20, 0, 20, 12),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
             child: Align(
               alignment: Alignment.centerLeft,
-              child: Text('Select country',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              child: Text('phone_select_country'.tr(),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
             ),
           ),
           // Search
@@ -189,8 +190,8 @@ class _CountryPickerSheetState extends State<_CountryPickerSheet> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
             child: TextField(
               autofocus: false,
-              decoration: const InputDecoration(
-                hintText: 'Search country or dial code...',
+              decoration: InputDecoration(
+                hintText: 'phone_search_hint'.tr(),
                 prefixIcon: Icon(Icons.search_rounded, size: 20),
                 contentPadding: EdgeInsets.symmetric(vertical: 10),
                 isDense: true,

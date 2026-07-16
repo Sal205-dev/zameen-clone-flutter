@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/providers.dart';
@@ -59,7 +60,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     setState(() {
       _usernameStatus  = 'checking';
-      _usernameMessage = 'Checking availability...';
+      _usernameMessage = 'auth_checking_availability'.tr();
     });
 
     _usernameTimer =
@@ -103,7 +104,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Profile updated successfully'),
+            content: Text('profile_updated_success'.tr()),
             backgroundColor: AppColors.primary,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -131,7 +132,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Edit profile'),
+        title: Text('settings_edit_profile'.tr()),
         actions: [
           // Save button in the app bar — only enabled when there's
           // an actual change and no pending availability check
@@ -150,7 +151,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     child: CircularProgressIndicator(
                         strokeWidth: 2, color: AppColors.primary))
                 : Text(
-                    'Save',
+                    'btn_save'.tr(),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -202,8 +203,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               ),
               const SizedBox(height: 32),
 
-              const Text('Username',
-                  style: TextStyle(
+              Text('field_username'.tr(),
+                  style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textSecondary)),
@@ -217,16 +218,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   setState(() {}); // rebuild to update Save button state
                 },
                 decoration: InputDecoration(
-                  hintText: 'Your username',
+                  hintText: 'hint_your_username'.tr(),
                   prefixIcon: const Icon(
                       Icons.person_outline_rounded, size: 20),
                   suffixIcon: _buildStatusIcon(),
                 ),
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) {
-                    return 'Username cannot be empty';
+                    return 'error_username_empty'.tr();
                   }
-                  if (v.trim().length < 3) return 'Minimum 3 characters';
+                  if (v.trim().length < 3) return 'error_username_min_length'.tr();
                   if (_usernameStatus == 'taken') return _usernameMessage;
                   if (_usernameStatus == 'invalid_chars') {
                     return _usernameMessage;
@@ -261,9 +262,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           color: AppColors.textSecondary)),
                 ),
               const SizedBox(height: 8),
-              const Text(
-                'Only letters, digits, and underscores. Min 3 characters.',
-                style: TextStyle(
+              Text(
+                'username_rules_hint'.tr(),
+                style: const TextStyle(
                     fontSize: 12, color: AppColors.textSecondary),
               ),
 
@@ -319,7 +320,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           width: 20,
                           child: CircularProgressIndicator(
                               strokeWidth: 2, color: Colors.white))
-                      : const Text('Save changes'),
+                      : Text('btn_save_changes'.tr()),
                 ),
               ),
             ],

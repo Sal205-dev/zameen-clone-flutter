@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -61,16 +62,16 @@ class _SplashScreenState extends State<SplashScreen>
             opacity: _fadeIn,
             child: ScaleTransition(
               scale: _scaleUp,
-              child: const Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // App icon
-                  Icon(Icons.location_city_rounded,
+                  const Icon(Icons.location_city_rounded,
                       size: 64, color: Colors.white),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                  // App name — changed from Zameen to DHA
-                  Text(
+                  // App name — changed from Zameen to DHA (brand name, not translated)
+                  const Text(
                     'DHA',
                     style: TextStyle(
                       fontSize: 42,
@@ -80,10 +81,10 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
 
-                  // Tagline — unchanged
+                  // Tagline
                   Text(
-                    'Live better',
-                    style: TextStyle(
+                    'tagline'.tr(),
+                    style: const TextStyle(
                       fontSize: 14,
                       color: Colors.white70,
                       fontWeight: FontWeight.w400,
@@ -91,10 +92,10 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                   ),
 
-                  SizedBox(height: 60),
+                  const SizedBox(height: 60),
 
                   // Loading indicator
-                  SizedBox(
+                  const SizedBox(
                     width: 24,
                     height: 24,
                     child: CircularProgressIndicator(

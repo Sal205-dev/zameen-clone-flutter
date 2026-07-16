@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import '../../../core/network/token_storage.dart';
 import '../domain/user_model.dart';
 
@@ -108,10 +109,10 @@ class AuthRepository {
       if (data.containsKey('detail')) return data['detail'].toString();
     }
     switch (e.response?.statusCode) {
-      case 400: return 'Invalid details. Please check your input.';
-      case 401: return 'Incorrect username or password.';
-      case 500: return 'Server error. Please try again later.';
-      default:  return 'Could not connect to server. Is it running?';
+      case 400: return 'error_invalid_details'.tr();
+      case 401: return 'error_incorrect_credentials'.tr();
+      case 500: return 'error_server'.tr();
+      default:  return 'error_connection'.tr();
     }
   }
 }
