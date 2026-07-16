@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -67,23 +68,43 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/', builder: (_, __) => const SplashScreen()),
-      GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
-      GoRoute(path: '/home', builder: (_, __) => const MainShell()),
+      GoRoute(
+          path: '/',
+          builder: (context, __) =>
+              _localeKeyed(context, const SplashScreen())),
+      GoRoute(
+          path: '/login',
+          builder: (context, __) =>
+              _localeKeyed(context, const LoginScreen())),
+      GoRoute(
+          path: '/home',
+          builder: (context, __) =>
+              _localeKeyed(context, const MainShell())),
       GoRoute(
         path: '/property/:id',
         builder: (context, state) {
           final id = int.parse(state.pathParameters['id']!);
-          return PropertyDetailScreen(propertyId: id);
+          return _localeKeyed(context, PropertyDetailScreen(propertyId: id));
         },
       ),
       GoRoute(
         path: '/post-listing',
-        builder: (_, __) => const PostListingScreen(),
+        builder: (context, __) =>
+            _localeKeyed(context, const PostListingScreen()),
       ),
     ],
   );
 });
+
+/// Wraps a route's page in a key tied to the current locale so it's torn
+/// down and rebuilt the instant the language changes — needed because
+/// most of the app calls 'key'.tr() without a BuildContext, so those
+/// widgets never register as EasyLocalization dependents and wouldn't
+/// otherwise rebuild on their own. Keying at the page level (inside the
+/// Navigator) avoids the black-flash a full MaterialApp/Navigator
+/// teardown would cause if the key were placed higher up the tree.
+Widget _localeKeyed(BuildContext context, Widget child) =>
+    KeyedSubtree(key: ValueKey(context.locale), child: child);
 
 /// Notifies go_router to re-run the redirect callback whenever auth state
 /// changes. This is intentionally separate from routerProvider watching

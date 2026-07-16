@@ -52,14 +52,6 @@ class ZameenCloneApp extends ConsumerWidget {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      // Most of the app calls 'key'.tr() without a BuildContext, so those
-      // widgets never register as dependents of EasyLocalization's
-      // InheritedWidget and don't rebuild on their own when the locale
-      // changes. Keying the whole app by locale forces Flutter to tear
-      // down and rebuild every screen the instant it switches, instead of
-      // waiting for some unrelated rebuild (pull-to-refresh, a nav tap...)
-      // to happen to pick up the new language.
-      key: ValueKey(context.locale),
       title: 'DHA',
       theme: AppTheme.light(),
       routerConfig: router,
