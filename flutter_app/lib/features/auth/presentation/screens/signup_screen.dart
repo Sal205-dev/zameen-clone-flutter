@@ -64,12 +64,22 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   String  _usernameMessage = '';
   Timer?  _usernameTimer;
 
+  // Email/phone live validation — debounced so an error only appears
+  // ~800ms after the user stops typing (not on every keystroke, and not
+  // before they've typed anything into that field).
+  Timer?  _emailTimer;
+  String? _emailLiveError;
+  Timer?  _phoneTimer;
+  String? _phoneLiveError;
+
   // Selected country code — default Pakistan
   CountryCode _country = const CountryCode('+92', 'Pakistan', '🇵🇰');
 
   @override
   void dispose() {
     _usernameTimer?.cancel();
+    _emailTimer?.cancel();
+    _phoneTimer?.cancel();
     _usernameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -120,10 +130,71 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     }
   }
 
+  // ── Email/phone live check — debounced, mirrors the username pattern ──
+  void _onEmailChanged(String value) {
+    _clearError();
+    _emailTimer?.cancel();
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      if (_emailLiveError != null) setState(() => _emailLiveError = null);
+      return;
+    }
+    _emailTimer = Timer(const Duration(milliseconds: 800), () {
+      if (!mounted) return;
+      setState(() => _emailLiveError =
+          _isAllowedEmail(trimmed) ? null : 'error_email_invalid'.tr());
+    });
+  }
+
+  void _onPhoneChanged() {
+    _clearError();
+    _phoneTimer?.cancel();
+    final trimmed = _phoneController.text.trim();
+    if (trimmed.isEmpty) {
+      if (_phoneLiveError != null) setState(() => _phoneLiveError = null);
+      return;
+    }
+    _phoneTimer = Timer(const Duration(milliseconds: 800), () {
+      if (!mounted) return;
+      setState(() => _phoneLiveError = _computePhoneError(trimmed));
+    });
+  }
+
+  /// ITU-T E.164 caps a full international number (country code +
+  /// subscriber number) at 15 digits. [trimmed] is expected non-empty.
+  String? _computePhoneError(String trimmed) {
+    if (trimmed.length < 7) return 'error_phone_invalid'.tr();
+    final subscriberDigits = trimmed.replaceAll(RegExp(r'\D'), '');
+    final countryDigits = _country.dial.replaceAll(RegExp(r'\D'), '');
+    if (countryDigits.length + subscriberDigits.length > 15) {
+      return 'error_phone_too_long'.tr();
+    }
+    return null;
+  }
+
   // ── Submit ────────────────────────────────────────────────────────
   Future<void> _submit() async {
     setState(() => _errorMessage = null);
-    if (!_formKey.currentState!.validate()) return;
+
+    // Email/phone aren't wired through Form.validator (that's what caused
+    // every field to light up together after one submit press) — check
+    // them manually here so an empty/never-touched field still blocks
+    // submit, same as before.
+    final emailValue = _emailController.text.trim();
+    final phoneValue = _phoneController.text.trim();
+    final emailError = emailValue.isEmpty
+        ? 'error_email_required'.tr()
+        : (_isAllowedEmail(emailValue) ? null : 'error_email_invalid'.tr());
+    final phoneError = phoneValue.isEmpty
+        ? 'error_phone_required'.tr()
+        : _computePhoneError(phoneValue);
+    setState(() {
+      _emailLiveError = emailError;
+      _phoneLiveError = phoneError;
+    });
+
+    final formOk = _formKey.currentState!.validate(); // username + password
+    if (!formOk || emailError != null || phoneError != null) return;
 
     // Block submit if username check shows it's taken
     if (_usernameStatus == 'taken' || _usernameStatus == 'invalid_chars') {
@@ -223,11 +294,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 padding: const EdgeInsets.all(24),
                 child: Form(
                   key: _formKey,
-                  // Re-runs each field's validator on every change (not just
-                  // on submit) once the user has interacted with it, so a
-                  // field error clears itself the moment it becomes valid
-                  // instead of staying stuck until the next submit press.
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -316,21 +382,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
-                        onChanged: (_) => _clearError(),
+                        onChanged: _onEmailChanged,
                         decoration: InputDecoration(
                           labelText: 'field_email'.tr(),
                           hintText: 'hint_email_example'.tr(),
                           prefixIcon: const Icon(Icons.email_outlined, size: 20),
+                          errorText: _emailLiveError,
                         ),
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
-                            return 'error_email_required'.tr();
-                          }
-                          if (!_isAllowedEmail(v)) {
-                            return 'error_email_invalid'.tr();
-                          }
-                          return null;
-                        },
                       ),
                       const SizedBox(height: 14),
 
@@ -338,28 +396,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       PhoneField(
                         numberController: _phoneController,
                         initialCountry: _country,
-                        onCountryChanged: (c) =>
-                            setState(() => _country = c),
-                        onChanged: _clearError,
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
-                            return 'error_phone_required'.tr();
-                          }
-                          if (v.trim().length < 7) {
-                            return 'error_phone_invalid'.tr();
-                          }
-                          // ITU-T E.164 caps a full international number
-                          // (country code + subscriber number) at 15 digits.
-                          final subscriberDigits =
-                              v.replaceAll(RegExp(r'\D'), '');
-                          final countryDigits =
-                              _country.dial.replaceAll(RegExp(r'\D'), '');
-                          if (countryDigits.length + subscriberDigits.length >
-                              15) {
-                            return 'error_phone_too_long'.tr();
-                          }
-                          return null;
+                        onCountryChanged: (c) {
+                          setState(() => _country = c);
+                          // Country code counts toward the 15-digit total —
+                          // re-check in case switching country pushed it
+                          // over the limit.
+                          _onPhoneChanged();
                         },
+                        onChanged: _onPhoneChanged,
+                        errorText: _phoneLiveError,
                       ),
                       const SizedBox(height: 14),
 

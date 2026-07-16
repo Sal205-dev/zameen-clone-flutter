@@ -50,6 +50,7 @@ class PhoneField extends StatefulWidget {
   final CountryCode initialCountry;
   final String? Function(String?)? validator;
   final VoidCallback? onChanged;
+  final String? errorText;
 
   const PhoneField({
     super.key,
@@ -58,6 +59,7 @@ class PhoneField extends StatefulWidget {
     required this.initialCountry,
     this.validator,
     this.onChanged,
+    this.errorText,
   });
 
   @override
@@ -131,6 +133,7 @@ class _PhoneFieldState extends State<PhoneField> {
           ),
         ),
         prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+        errorText: widget.errorText,
       ),
       validator: widget.validator,
     );
