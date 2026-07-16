@@ -206,12 +206,31 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
           baths: _bathsController.text.isEmpty ? null : int.tryParse(_bathsController.text),
         );
 
-        // Upload any newly added images
+        // Upload any newly added images — keep going even if one fails,
+        // but remember failures so they can be reported (not silently
+        // dropped, unlike before).
+        final imageErrors = <String>[];
         for (int i = 0; i < _pickedImages.length; i++) {
-          await repo.uploadImage(
-              propertyId: widget.editProperty!.id,
-              filePath: _pickedImages[i].path,
-              isPrimary: false); // don't override the existing primary
+          try {
+            await repo.uploadImage(
+                propertyId: widget.editProperty!.id,
+                filePath: _pickedImages[i].path,
+                isPrimary: false); // don't override the existing primary
+          } catch (e) {
+            imageErrors.add('$e');
+          }
+        }
+        if (imageErrors.isNotEmpty && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('images_partial_failure'.tr(namedArgs: {
+                  'failed': '${imageErrors.length}',
+                  'total': '${_pickedImages.length}',
+                  'error': imageErrors.first,
+                })),
+                backgroundColor: AppColors.error,
+                behavior: SnackBarBehavior.floating),
+          );
         }
 
         // Upload new video if picked
@@ -250,12 +269,31 @@ class _PostListingScreenState extends ConsumerState<PostListingScreen> {
 
         final newId = response.data['id'] as int;
 
-        // Upload images (first one becomes the cover/primary)
+        // Upload images (first one becomes the cover/primary) — keep
+        // going even if one fails, but report failures instead of
+        // silently dropping them.
+        final imageErrors = <String>[];
         for (int i = 0; i < _pickedImages.length; i++) {
-          await repo.uploadImage(
-              propertyId: newId,
-              filePath: _pickedImages[i].path,
-              isPrimary: i == 0);
+          try {
+            await repo.uploadImage(
+                propertyId: newId,
+                filePath: _pickedImages[i].path,
+                isPrimary: i == 0);
+          } catch (e) {
+            imageErrors.add('$e');
+          }
+        }
+        if (imageErrors.isNotEmpty && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('images_partial_failure'.tr(namedArgs: {
+                  'failed': '${imageErrors.length}',
+                  'total': '${_pickedImages.length}',
+                  'error': imageErrors.first,
+                })),
+                backgroundColor: AppColors.error,
+                behavior: SnackBarBehavior.floating),
+          );
         }
 
         // Upload video if picked

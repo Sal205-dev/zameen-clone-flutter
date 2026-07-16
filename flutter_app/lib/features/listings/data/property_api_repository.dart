@@ -67,6 +67,12 @@ class PropertyApiRepository {
   /// POST /api/property-images/ — uploads one photo for a listing.
   /// [isPrimary] marks the first image as the cover shown on cards and the
   /// detail screen header. Pass true only for the first image in the loop.
+  ///
+  /// Throws a clean error String on failure — the caller decides whether
+  /// to surface it and whether to keep uploading the rest (the listing
+  /// itself is already saved either way, so a failed photo isn't fatal,
+  /// but the caller should tell the user about it instead of it vanishing
+  /// silently).
   Future<void> uploadImage({
     required int propertyId,
     required String filePath,
@@ -79,9 +85,15 @@ class PropertyApiRepository {
         'is_primary': isPrimary.toString(),
       });
       await _dio.post('/property-images/', data: formData);
-    } on DioException catch (_) {
-      // Don't fail the whole post if one image upload fails —
-      // the listing is already saved, images can be retried later.
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      if (data is Map) {
+        for (final v in data.values) {
+          if (v is List && v.isNotEmpty) throw v.first.toString();
+          if (v is String) throw v;
+        }
+      }
+      throw 'error_image_upload_failed'.tr();
     }
   }
 

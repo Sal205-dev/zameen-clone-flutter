@@ -33,6 +33,8 @@
   "error_phone_required": "Phone number is required",
   "error_phone_invalid": "Enter a valid phone number",
   "error_phone_too_long": "Phone number is too long (max 15 digits total, including country code)",
+  "error_image_upload_failed": "Image upload failed.",
+  "images_partial_failure": "{failed} of {total} photos failed to upload: {error}",
   "error_login_failed": "Login failed.",
   "error_signup_failed": "Signup failed.",
   "error_invalid_details": "Invalid details. Please check your input.",
