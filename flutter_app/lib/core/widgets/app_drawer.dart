@@ -1,8 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../localization/app_strings.dart';
-import '../localization/locale_provider.dart';
 import '../theme/app_theme.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 
@@ -12,7 +11,7 @@ class AppDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authNotifierProvider).value;
-    final s = AppStrings.of(context);
+    final isUrdu = context.locale.languageCode == 'ur';
 
     return Drawer(
       backgroundColor: AppColors.surface,
@@ -48,7 +47,7 @@ class AppDrawer extends ConsumerWidget {
                                   fontWeight: FontWeight.w800,
                                   color: AppColors.primary,
                                   letterSpacing: -0.5)),
-                          Text(s.tagline,
+                          Text('tagline'.tr(),
                               style: const TextStyle(
                                   fontSize: 10,
                                   color: AppColors.textSecondary)),
@@ -109,7 +108,7 @@ class AppDrawer extends ConsumerWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(s.loginOrCreateAccount),
+                          Text('login_or_create_account'.tr()),
                           const SizedBox(width: 6),
                           const Icon(Icons.arrow_forward_rounded, size: 16),
                         ],
@@ -128,13 +127,13 @@ class AppDrawer extends ConsumerWidget {
                 children: [
                   _DrawerItem(
                     icon: Icons.home_rounded,
-                    label: s.navHome,
+                    label: 'nav_home'.tr(),
                     active: true,
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.add_home_outlined,
-                    label: s.addProperty,
+                    label: 'add_property'.tr(),
                     onTap: () {
                       Navigator.of(context).pop();
                       context.push('/post-listing');
@@ -142,38 +141,38 @@ class AppDrawer extends ConsumerWidget {
                   ),
                   _DrawerItem(
                     icon: Icons.search_rounded,
-                    label: s.searchProperties,
+                    label: 'search_properties'.tr(),
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.location_city_outlined,
-                    label: s.newProjects,
+                    label: 'new_projects'.tr(),
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.favorite_border_rounded,
-                    label: s.navFavorites,
+                    label: 'nav_favorites'.tr(),
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.bookmark_border_rounded,
-                    label: s.savedSearches,
+                    label: 'saved_searches'.tr(),
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.handyman_outlined,
-                    label: s.dhaTools,
-                    badge: s.newBadge,
+                    label: 'dha_tools'.tr(),
+                    badge: 'new_badge'.tr(),
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.newspaper_outlined,
-                    label: s.dhaNews,
+                    label: 'dha_news'.tr(),
                     onTap: () => Navigator.of(context).pop(),
                   ),
                   _DrawerItem(
                     icon: Icons.chat_bubble_outline_rounded,
-                    label: s.dhaBlog,
+                    label: 'dha_blog'.tr(),
                     onTap: () => Navigator.of(context).pop(),
                   ),
 
@@ -185,7 +184,7 @@ class AppDrawer extends ConsumerWidget {
                         const Expanded(child: Divider()),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(s.appControls,
+                          child: Text('app_controls'.tr(),
                               style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
@@ -199,15 +198,17 @@ class AppDrawer extends ConsumerWidget {
 
                   _DrawerItem(
                     icon: Icons.language_rounded,
-                    label: s.switchLanguageLabel,
+                    // Shows the *other* language — tapping it switches TO it.
+                    label: isUrdu ? 'English' : 'اردو',
                     onTap: () {
-                      ref.read(localeProvider.notifier).toggle();
+                      context.setLocale(
+                          isUrdu ? const Locale('en') : const Locale('ur'));
                       Navigator.of(context).pop();
                     },
                   ),
                   _DrawerItem(
                     icon: Icons.info_outline_rounded,
-                    label: s.aboutUs,
+                    label: 'about_us'.tr(),
                     onTap: () => Navigator.of(context).pop(),
                   ),
 
@@ -219,7 +220,7 @@ class AppDrawer extends ConsumerWidget {
                     ),
                     _DrawerItem(
                       icon: Icons.logout_rounded,
-                      label: s.logout,
+                      label: 'logout'.tr(),
                       color: AppColors.error,
                       onTap: () {
                         Navigator.of(context).pop();

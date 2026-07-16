@@ -1,9 +1,9 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../features/favorites/presentation/screens/favorites_screen.dart';
 import '../../features/listings/presentation/screens/listings_screen.dart';
 import '../../features/map_search/presentation/screens/map_search_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
-import '../localization/app_strings.dart';
 import '../theme/app_theme.dart';
 import 'app_drawer.dart';
 
@@ -17,10 +17,10 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
 
-  Widget _buildScreen(int index, AppStrings s) {
+  Widget _buildScreen(int index) {
     switch (index) {
       case 0: return const ListingsScreen();
-      case 1: return _PlaceholderScreen(label: s.navProjects);
+      case 1: return _PlaceholderScreen(label: 'nav_projects'.tr());
       case 2: return const MapSearchScreen();
       case 3: return const FavoritesScreen();
       case 4: return const ProfileScreen();
@@ -30,10 +30,9 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    final s = AppStrings.of(context);
     return Scaffold(
       drawer: const AppDrawer(),
-      body: _buildScreen(_currentIndex, s),
+      body: _buildScreen(_currentIndex),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: AppColors.surface,
@@ -48,12 +47,12 @@ class _MainShellState extends State<MainShell> {
               children: [
                 _NavItem(
                   icon: Icons.home_outlined, activeIcon: Icons.home_rounded,
-                  label: s.navHome, index: 0, current: _currentIndex,
+                  label: 'nav_home'.tr(), index: 0, current: _currentIndex,
                   onTap: (i) => setState(() => _currentIndex = i),
                 ),
                 _NavItem(
                   icon: Icons.location_city_outlined, activeIcon: Icons.location_city_rounded,
-                  label: s.navProjects, index: 1, current: _currentIndex,
+                  label: 'nav_projects'.tr(), index: 1, current: _currentIndex,
                   onTap: (i) => setState(() => _currentIndex = i),
                 ),
 
@@ -84,7 +83,7 @@ class _MainShellState extends State<MainShell> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          s.navSearch,
+                          'nav_search'.tr(),
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
@@ -100,12 +99,12 @@ class _MainShellState extends State<MainShell> {
 
                 _NavItem(
                   icon: Icons.favorite_border_rounded, activeIcon: Icons.favorite_rounded,
-                  label: s.navFavorites, index: 3, current: _currentIndex,
+                  label: 'nav_favorites'.tr(), index: 3, current: _currentIndex,
                   onTap: (i) => setState(() => _currentIndex = i),
                 ),
                 _NavItem(
                   icon: Icons.person_outline_rounded, activeIcon: Icons.person_rounded,
-                  label: s.navProfile, index: 4, current: _currentIndex,
+                  label: 'nav_profile'.tr(), index: 4, current: _currentIndex,
                   onTap: (i) => setState(() => _currentIndex = i),
                 ),
               ],
@@ -165,7 +164,6 @@ class _PlaceholderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = AppStrings.of(context);
     return Scaffold(
       body: Center(
         child: Column(
@@ -178,7 +176,7 @@ class _PlaceholderScreen extends StatelessWidget {
                 style: const TextStyle(
                     fontSize: 18, fontWeight: FontWeight.w600)),
             const SizedBox(height: 4),
-            Text(s.comingSoon,
+            Text('coming_soon'.tr(),
                 style: const TextStyle(color: AppColors.textSecondary)),
           ],
         ),

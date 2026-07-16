@@ -1,10 +1,9 @@
 import 'dart:io' show Platform;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
-import 'core/localization/locale_provider.dart';
 import 'core/routing/app_router.dart';
 import 'core/theme/app_theme.dart';
 
@@ -15,6 +14,7 @@ const _desktopWindowSize = Size(430, 900);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
 
   // window_manager only applies to Windows/macOS/Linux builds — calling its
   // APIs on Android/iOS/web would throw, so this whole block is skipped
@@ -34,7 +34,14 @@ void main() async {
     });
   }
 
-  runApp(const ProviderScope(child: ZameenCloneApp()));
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('en'), Locale('ur')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      child: const ProviderScope(child: ZameenCloneApp()),
+    ),
+  );
 }
 
 class ZameenCloneApp extends ConsumerWidget {
@@ -43,19 +50,14 @@ class ZameenCloneApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-    final locale = ref.watch(localeProvider);
 
     return MaterialApp.router(
       title: 'DHA',
       theme: AppTheme.light(),
       routerConfig: router,
-      locale: locale,
-      supportedLocales: const [Locale('en'), Locale('ur')],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
+      locale: context.locale,
+      supportedLocales: context.supportedLocales,
+      localizationsDelegates: context.localizationDelegates,
     );
   }
 }

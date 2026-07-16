@@ -1,0 +1,21 @@
+{
+  "nav_home": "Home",
+  "nav_projects": "Projects",
+  "nav_search": "Search",
+  "nav_favorites": "Favorites",
+  "nav_profile": "Profile",
+  "coming_soon": "Coming soon",
+  "tagline": "Live better",
+  "login_or_create_account": "Login or Create Account",
+  "add_property": "Add Property",
+  "search_properties": "Search Properties",
+  "new_projects": "New Projects",
+  "saved_searches": "Saved Searches",
+  "dha_tools": "DHA Tools",
+  "new_badge": "New",
+  "dha_news": "DHA News",
+  "dha_blog": "DHA Blog",
+  "app_controls": "APP CONTROLS",
+  "about_us": "About Us",
+  "logout": "Log out"
+}
