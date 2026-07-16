@@ -9,11 +9,35 @@ import '../providers/auth_provider.dart';
 import '../widgets/password_strength_indicator.dart';
 import '../widgets/phone_field.dart';
 
-/// Email regex — accepts any valid email address format.
-/// Covers gmail.com, yahoo.com, outlook.com, company domains, etc.
+/// Basic email shape check (something@something.tld) — a prerequisite,
+/// not sufficient on its own since we also restrict to common providers
+/// below.
 final _emailRegex = RegExp(
   r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$',
 );
+
+/// Only these providers are accepted at signup — the 10 most common
+/// global email services. Anything else (including work/company domains)
+/// is rejected.
+const _allowedEmailDomains = {
+  'gmail.com',
+  'yahoo.com',
+  'outlook.com',
+  'hotmail.com',
+  'icloud.com',
+  'aol.com',
+  'protonmail.com',
+  'live.com',
+  'msn.com',
+  'zoho.com',
+};
+
+bool _isAllowedEmail(String email) {
+  final trimmed = email.trim().toLowerCase();
+  if (!_emailRegex.hasMatch(trimmed)) return false;
+  final domain = trimmed.split('@').last;
+  return _allowedEmailDomains.contains(domain);
+}
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -199,6 +223,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 padding: const EdgeInsets.all(24),
                 child: Form(
                   key: _formKey,
+                  // Re-runs each field's validator on every change (not just
+                  // on submit) once the user has interacted with it, so a
+                  // field error clears itself the moment it becomes valid
+                  // instead of staying stuck until the next submit press.
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -297,7 +326,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           if (v == null || v.trim().isEmpty) {
                             return 'error_email_required'.tr();
                           }
-                          if (!_emailRegex.hasMatch(v.trim())) {
+                          if (!_isAllowedEmail(v)) {
                             return 'error_email_invalid'.tr();
                           }
                           return null;
@@ -318,6 +347,16 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           }
                           if (v.trim().length < 7) {
                             return 'error_phone_invalid'.tr();
+                          }
+                          // ITU-T E.164 caps a full international number
+                          // (country code + subscriber number) at 15 digits.
+                          final subscriberDigits =
+                              v.replaceAll(RegExp(r'\D'), '');
+                          final countryDigits =
+                              _country.dial.replaceAll(RegExp(r'\D'), '');
+                          if (countryDigits.length + subscriberDigits.length >
+                              15) {
+                            return 'error_phone_too_long'.tr();
                           }
                           return null;
                         },
