@@ -6,7 +6,21 @@ import '../theme/app_theme.dart';
 import '../../features/auth/presentation/providers/auth_provider.dart';
 
 class AppDrawer extends ConsumerWidget {
-  const AppDrawer({super.key});
+  /// Switches the bottom-nav tab to the real Favorites screen — that
+  /// screen already exists, so this item should actually go there
+  /// rather than showing a "coming soon" message.
+  final VoidCallback? onFavoritesTap;
+
+  const AppDrawer({super.key, this.onFavoritesTap});
+
+  void _showComingSoon(BuildContext context) {
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('coming_soon'.tr()),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+    ));
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -142,38 +156,41 @@ class AppDrawer extends ConsumerWidget {
                   _DrawerItem(
                     icon: Icons.search_rounded,
                     label: 'search_properties'.tr(),
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () => _showComingSoon(context),
                   ),
                   _DrawerItem(
                     icon: Icons.location_city_outlined,
                     label: 'new_projects'.tr(),
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () => _showComingSoon(context),
                   ),
                   _DrawerItem(
                     icon: Icons.favorite_border_rounded,
                     label: 'nav_favorites'.tr(),
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      onFavoritesTap?.call();
+                    },
                   ),
                   _DrawerItem(
                     icon: Icons.bookmark_border_rounded,
                     label: 'saved_searches'.tr(),
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () => _showComingSoon(context),
                   ),
                   _DrawerItem(
                     icon: Icons.handyman_outlined,
                     label: 'dha_tools'.tr(),
                     badge: 'new_badge'.tr(),
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () => _showComingSoon(context),
                   ),
                   _DrawerItem(
                     icon: Icons.newspaper_outlined,
                     label: 'dha_news'.tr(),
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () => _showComingSoon(context),
                   ),
                   _DrawerItem(
                     icon: Icons.chat_bubble_outline_rounded,
                     label: 'dha_blog'.tr(),
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () => _showComingSoon(context),
                   ),
 
                   // ── App Controls section ───────────────────────
@@ -209,7 +226,7 @@ class AppDrawer extends ConsumerWidget {
                   _DrawerItem(
                     icon: Icons.info_outline_rounded,
                     label: 'about_us'.tr(),
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () => _showComingSoon(context),
                   ),
 
                   // Logout only shown when logged in

@@ -31,7 +31,9 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const AppDrawer(),
+      drawer: AppDrawer(
+        onFavoritesTap: () => setState(() => _currentIndex = 3),
+      ),
       body: _buildScreen(_currentIndex),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
