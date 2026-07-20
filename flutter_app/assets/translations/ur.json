@@ -35,6 +35,7 @@
   "error_phone_too_long": "فون نمبر بہت لمبا ہے (ملکی کوڈ سمیت زیادہ سے زیادہ 15 ہندسے)",
   "error_image_upload_failed": "تصویر اپ لوڈ ناکام ہوگئی۔",
   "images_partial_failure": "{total} میں سے {failed} تصاویر اپ لوڈ نہیں ہو سکیں: {error}",
+  "error_rate_limited": "بہت زیادہ کوششیں۔ براہ کرم تھوڑی دیر انتظار کریں اور دوبارہ کوشش کریں۔",
   "error_login_failed": "لاگ اِن ناکام ہوگیا۔",
   "error_signup_failed": "اکاؤنٹ بنانا ناکام ہوگیا۔",
   "error_invalid_details": "غلط تفصیلات۔ براہ کرم اپنی معلومات چیک کریں۔",

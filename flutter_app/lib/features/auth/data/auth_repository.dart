@@ -100,6 +100,12 @@ class AuthRepository {
   Future<bool> isLoggedIn() => _tokenStorage.hasToken();
 
   String _parseError(DioException e) {
+    // Checked first — DRF's throttle response is itself valid JSON with a
+    // 'detail' key, so the generic Map-parsing below would otherwise
+    // surface its raw (English-only, fairly technical) wording instead
+    // of a clean, translated one.
+    if (e.response?.statusCode == 429) return 'error_rate_limited'.tr();
+
     final data = e.response?.data;
     if (data is Map) {
       for (final value in data.values) {
