@@ -99,6 +99,52 @@ class AuthRepository {
   Future<void> logout() => _tokenStorage.clear();
   Future<bool> isLoggedIn() => _tokenStorage.hasToken();
 
+  /// POST /api/auth/password-reset/request/ — emails a 6-digit code.
+  /// Always "succeeds" from the caller's perspective (the backend never
+  /// reveals whether the email is actually registered).
+  Future<void> requestPasswordReset(String email) async {
+    try {
+      await _dio.post('/auth/password-reset/request/', data: {'email': email});
+    } on DioException catch (e) {
+      throw _parseError(e);
+    }
+  }
+
+  /// POST /api/auth/password-reset/confirm/ — code + new password.
+  Future<void> confirmPasswordReset({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    try {
+      await _dio.post('/auth/password-reset/confirm/', data: {
+        'email': email,
+        'code': code,
+        'new_password': newPassword,
+      });
+    } on DioException catch (e) {
+      throw _parseError(e);
+    }
+  }
+
+  /// POST /api/auth/verify-email/ — code sent automatically at signup.
+  Future<void> verifyEmail({required String email, required String code}) async {
+    try {
+      await _dio.post('/auth/verify-email/', data: {'email': email, 'code': code});
+    } on DioException catch (e) {
+      throw _parseError(e);
+    }
+  }
+
+  /// POST /api/auth/verify-email/resend/
+  Future<void> resendVerificationEmail(String email) async {
+    try {
+      await _dio.post('/auth/verify-email/resend/', data: {'email': email});
+    } on DioException catch (e) {
+      throw _parseError(e);
+    }
+  }
+
   String _parseError(DioException e) {
     // Checked first — DRF's throttle response is itself valid JSON with a
     // 'detail' key, so the generic Map-parsing below would otherwise

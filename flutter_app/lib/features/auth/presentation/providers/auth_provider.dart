@@ -94,6 +94,15 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     final updated = await repo.updateProfile(username: username);
     state = AsyncValue.data(updated);
   }
+
+  /// Re-fetches the current user — used after email verification succeeds
+  /// so the "verify your email" banner disappears immediately instead of
+  /// waiting for the next app restart.
+  Future<void> refreshProfile() async {
+    final repo = ref.read(authRepositoryProvider);
+    final updated = await repo.getCurrentUser();
+    state = AsyncValue.data(updated);
+  }
 }
 
 final authNotifierProvider =

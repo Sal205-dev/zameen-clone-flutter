@@ -6,6 +6,7 @@ import '../../../../core/mock/mock_data.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'edit_profile_screen.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../auth/presentation/screens/verify_email_screen.dart';
 import '../../../listings/domain/property_model.dart';
 import '../../../listings/presentation/screens/post_listing_screen.dart';
 import '../../../listings/presentation/widgets/property_card.dart';
@@ -71,6 +72,40 @@ class ProfileScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (!user.emailVerified) ...[
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) =>
+                                  VerifyEmailScreen(email: user.email))),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.shade50,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.orange.shade200),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.mark_email_unread_outlined,
+                                color: Colors.orange.shade700, size: 20),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text('verify_email_banner'.tr(),
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.orange.shade900)),
+                            ),
+                            Icon(Icons.arrow_forward_ios_rounded,
+                                size: 14, color: Colors.orange.shade700),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                   if (user.isAgent) ...[
                     // Post listing CTA
                     GestureDetector(

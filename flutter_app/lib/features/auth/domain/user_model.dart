@@ -5,6 +5,7 @@ class UserModel {
   final String email;
   final String phone;
   final String role; // 'buyer' | 'agent' | 'admin'
+  final bool emailVerified;
 
   const UserModel({
     required this.id,
@@ -12,6 +13,7 @@ class UserModel {
     required this.email,
     required this.phone,
     required this.role,
+    this.emailVerified = false,
   });
 
   bool get isAgent => role == 'agent';
@@ -26,6 +28,7 @@ class UserModel {
       email:    json['email'] as String? ?? '',
       phone:    json['phone'] as String? ?? '',
       role:     json['role'] as String? ?? 'buyer',
+      emailVerified: json['email_verified'] as bool? ?? false,
     );
   }
 }

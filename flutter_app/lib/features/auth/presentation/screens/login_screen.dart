@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
+import 'forgot_password_screen.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -184,7 +185,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ? 'error_password_required'.tr()
                                 : null,
                       ),
-                      const SizedBox(height: 20),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (_) => const ForgotPasswordScreen())),
+                          child: Text('forgot_password_link'.tr()),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
 
                       // ── Inline error box ─────────────────────────
                       if (_errorMessage != null)
