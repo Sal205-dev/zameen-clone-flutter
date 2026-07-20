@@ -49,6 +49,8 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     required String password,
     required String phone,
     required String role,
+    required String firstName,
+    required String lastName,
   }) async {
     state = const AsyncValue.loading();
     final repo = ref.read(authRepositoryProvider);
@@ -59,6 +61,8 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
         password: password,
         phone: phone,
         role: role,
+        firstName: firstName,
+        lastName: lastName,
       );
       // Log in right after signup so tokens are stored
       return repo.login(username: username, password: password);

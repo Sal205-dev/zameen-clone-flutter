@@ -48,6 +48,8 @@ class SignupScreen extends ConsumerStatefulWidget {
 
 class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _firstNameController = TextEditingController();
+  final _lastNameController  = TextEditingController();
   final _usernameController = TextEditingController();
   final _emailController    = TextEditingController();
   final _phoneController    = TextEditingController();
@@ -80,6 +82,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     _usernameTimer?.cancel();
     _emailTimer?.cancel();
     _phoneTimer?.cancel();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _usernameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
@@ -217,6 +221,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           password: _passwordController.text,
           phone: fullPhone,
           role: _role,
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
         );
   }
 
@@ -329,6 +335,42 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
+
+                      // ── First / last name ────────────────────────
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _firstNameController,
+                              textInputAction: TextInputAction.next,
+                              onChanged: (_) => _clearError(),
+                              decoration: InputDecoration(
+                                labelText: 'field_first_name'.tr(),
+                                prefixIcon: const Icon(
+                                    Icons.badge_outlined, size: 20),
+                              ),
+                              validator: (v) => (v == null || v.trim().isEmpty)
+                                  ? 'error_first_name_required'.tr()
+                                  : null,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: TextFormField(
+                              controller: _lastNameController,
+                              textInputAction: TextInputAction.next,
+                              onChanged: (_) => _clearError(),
+                              decoration: InputDecoration(
+                                labelText: 'field_last_name'.tr(),
+                              ),
+                              validator: (v) => (v == null || v.trim().isEmpty)
+                                  ? 'error_last_name_required'.tr()
+                                  : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
 
                       // ── Username ─────────────────────────────────
                       TextFormField(

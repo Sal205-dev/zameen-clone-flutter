@@ -5,6 +5,8 @@ class UserModel {
   final String email;
   final String phone;
   final String role; // 'buyer' | 'agent' | 'admin'
+  final String firstName;
+  final String lastName;
   final bool emailVerified;
 
   const UserModel({
@@ -13,6 +15,8 @@ class UserModel {
     required this.email,
     required this.phone,
     required this.role,
+    this.firstName = '',
+    this.lastName = '',
     this.emailVerified = false,
   });
 
@@ -28,6 +32,8 @@ class UserModel {
       email:    json['email'] as String? ?? '',
       phone:    json['phone'] as String? ?? '',
       role:     json['role'] as String? ?? 'buyer',
+      firstName: json['first_name'] as String? ?? '',
+      lastName:  json['last_name'] as String? ?? '',
       emailVerified: json['email_verified'] as bool? ?? false,
     );
   }

@@ -15,6 +15,8 @@ class AuthRepository {
     required String password,
     required String phone,
     required String role,
+    required String firstName,
+    required String lastName,
   }) async {
     try {
       await _dio.post('/auth/signup/', data: {
@@ -23,6 +25,8 @@ class AuthRepository {
         'password': password,
         'phone': phone,
         'role': role,
+        'first_name': firstName,
+        'last_name': lastName,
       });
     } on DioException catch (e) {
       throw _parseError(e);
