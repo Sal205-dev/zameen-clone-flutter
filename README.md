@@ -1,127 +1,140 @@
-# Zameen Clone — UI-only Flutter build
+# DHA App — Flutter Frontend
 
-This is a **UI-only** version of the app: every screen, button, and flow
-works, but it's all backed by in-memory mock data — no Django server, no
-PostgreSQL, no network calls of any kind except fetching public OpenStreetMap
-map tiles. Nothing here talks to the `backend/` folder in this project.
+The mobile client for the DHA App real-estate platform. Fully connected to
+the live Django backend (see `dha-backend`, deployed on Railway) — real
+accounts, real JWT auth, real property listings with photo/video uploads
+to Cloudinary, real email verification and password reset. This is **not**
+a mock/UI-only build anymore.
 
-This is intentional, not a fallback — it's for testing layout, navigation,
-and interaction flow quickly, without the setup overhead of running a
-database and API server alongside it. When you're ready to connect the real
-backend (Django + PostGIS, already built and tested — see `backend/`),
-that's a separate, larger task: swapping the mock providers in
-`lib/core/mock/mock_data.dart` for real repository classes that call the API.
+## What works
 
-## What works right now
+- **Auth**: sign up (username, email, password, phone, first/last name,
+  role), log in, log out, JWT tokens stored in encrypted secure storage
+  and auto-refreshed. Live username-availability check while typing.
+- **Email verification & password reset**: a code is emailed on signup
+  (via the backend's Brevo integration); the profile screen shows an
+  unverified banner until confirmed. "Forgot password" flow on the login
+  screen.
+- **Signup validation**: debounced (not per-keystroke) live checks —
+  email restricted to the 10 most common providers, phone capped at the
+  ITU's 15-digit international limit, password strength meter.
+- **Listings feed**: real properties fetched from the API, filterable by
+  city, purpose, type, price range, bedrooms.
+- **Post a property** (agent role): full form, multi-photo + video upload
+  — files go straight to Cloudinary via the backend, with per-file error
+  handling so one failed upload doesn't silently break the rest.
+- **Property detail**: full info page, favorite toggle.
+- **Profile**: view/edit profile, email verification banner, logout.
+- **Full English/Urdu localization**: every screen, powered by
+  `easy_localization` — a language toggle in the side drawer switches the
+  whole app instantly.
+- **Side drawer**: functional nav items (Home, Post a property, Favorites)
+  plus "coming soon" feedback on the not-yet-built ones (Search, Projects,
+  Saved Searches, DHA Tools, News, Blog, About Us) instead of doing
+  nothing when tapped.
 
-- **Auth**: sign up as buyer or agent (any credentials "succeed" — there's
-  no real account system), log in, log out. Role choice on signup determines
-  whether you see agent-only features.
-- **Listings feed**: 6 seeded mock properties across Islamabad, Rawalpindi,
-  Lahore, and Karachi. Filter by city, purpose, type, price range, bedrooms.
-- **Property detail**: full info, favorite toggle, contact-agent sheet
-  (call/WhatsApp/message buttons are mocked — they show a confirmation
-  snackbar instead of actually launching anything).
-- **Map search**: real OpenStreetMap tiles, draggable center pin, radius
-  slider. The distance filtering is genuinely correct (haversine formula),
-  not just decorative — it's the same math a real backend would use, just
-  run on-device against the mock list instead of in PostgreSQL.
-- **Favorites**: save/unsave from any card, dedicated saved screen.
-- **Post a property** (agent-only): full form with multi-photo picker
-  (photos are shown locally via `Image.file`, never uploaded anywhere) —
-  posting adds the listing to the in-memory list immediately, and it shows
-  up in both the feed and your profile's "My listings."
-- **Profile**: role badge, my listings (agents), logout.
+## Known limitations (not yet wired to the backend)
 
-## What's mocked / simplified vs. the full version
+- **Map search** still runs on in-memory mock data
+  (`lib/core/mock/mock_data.dart`), not the real API — the OpenStreetMap
+  tiles and radius/haversine filtering are real, the listings behind them
+  aren't.
+- **Favorites** are local-only (not synced to your account server-side) —
+  they reset if the app is reinstalled.
+- **"Use my location"** jumps to a fixed coordinate instead of asking for
+  real GPS — no `geolocator` dependency yet.
+- **Call / WhatsApp / message buttons** on property detail show a
+  confirmation snackbar instead of actually deep-linking out — no
+  `url_launcher` dependency yet.
+- **"Projects"** bottom-nav tab is a placeholder screen.
+- No iOS project has been scaffolded, and there's no automated test suite.
 
-- No backend calls anywhere — `lib/core/mock/mock_data.dart` is the single
-  source of truth for all data, held in Riverpod `Notifier`s.
-- All data resets when you restart the app — nothing persists.
-- "Use my location" on the map and in post-listing jumps to a fixed
-  coordinate instead of asking for real GPS — there's no `geolocator`
-  dependency in this build.
-- City names in the post-listing form only geocode correctly for
-  Islamabad, Rawalpindi, Lahore, and Karachi (a tiny hardcoded lookup) —
-  anything else falls back to Islamabad's coordinates on the map.
-- Call/WhatsApp/message buttons simulate the action with a snackbar instead
-  of actually deep-linking out — no `url_launcher` dependency in this build.
+## Tech stack
 
-## Running on Windows (phone-sized desktop window)
+- Flutter + Riverpod (state management)
+- `go_router` — routing, with auth-aware redirects
+- `dio` — HTTP client, talks to the Django backend (15s timeouts)
+- `flutter_secure_storage` — encrypted JWT token storage
+- `easy_localization` — English/Urdu translations
+  (`assets/translations/en.json`, `ur.json`)
+- `flutter_map` + `latlong2` — OpenStreetMap-based map search
+- `image_picker` / `video_player` — property media
 
-1. **One-time setup**, if you haven't built a Windows Flutter app before:
-   ```bash
-   flutter config --enable-windows-desktop
-   ```
-   You also need the "Desktop development with C++" workload installed via
-   Visual Studio (the free Community edition works) — check with
-   `flutter doctor`, it'll tell you if this is missing.
+## Backend connection
 
-2. From `flutter_app/`, generate the native Windows project (this only
-   needs to happen once — it fills in the `windows/` folder without
-   touching your existing `lib/` or `pubspec.yaml`):
-   ```bash
-   cd flutter_app
-   flutter create . --platforms=windows --org com.yourname --project-name zameen_clone
-   ```
+The API base URL is hardcoded in `lib/core/utils/app_constants.dart`:
+```dart
+static String get apiBaseUrl =>
+    'https://dha-backend-production.up.railway.app/api';
+```
+This points at the live Railway deployment — the app works from any
+device with internet access, no local server or matching Wi-Fi network
+needed. Only change this if you're deliberately testing against a local
+backend (see the backend repo's README for that setup), and revert it
+before committing.
 
-3. ```bash
-   flutter pub get
-   flutter analyze
-   ```
-   Run `flutter analyze` before anything else — this sandbox doesn't have
-   the Flutter SDK to run it directly, so every file was checked by hand
-   for import correctness and brace/paren/bracket balance, but a type-level
-   check on your machine is still the real test.
+## Running the app
 
-4. ```bash
-   flutter run -d windows
-   ```
+### One-time setup, if you haven't built for this platform before
+```bash
+flutter config --enable-windows-desktop   # only if targeting Windows
+```
+Windows also needs the "Desktop development with C++" workload via Visual
+Studio — `flutter doctor` will flag it if missing.
 
-The window opens locked at 430×900 (no resizing) so it reads as a phone
-screen rather than a normal resizable desktop window. Change
-`_desktopWindowSize` near the top of `lib/main.dart` if you want different
-dimensions.
+### Generate the native project (first time only)
+```bash
+cd flutter_app
+flutter create . --platforms=windows,android --org com.yourname --project-name zameen_clone
+```
+Drop `--platforms` (or list the ones you need) to target Android/iOS
+instead — this only fills in the native `windows/`/`android/` folders
+without touching `lib/` or `pubspec.yaml`.
 
-## Running on Android/iOS instead
+### Install dependencies and run
+```bash
+flutter pub get
+flutter analyze
+flutter run
+```
+Pick a connected device or running emulator when prompted, or add `-d
+windows` / `-d chrome` / etc. to target a specific one.
 
-Same `flutter create .` step (drop `--platforms=windows`, or just run it
-with no `--platforms` flag to generate everything), then `flutter run` with
-an emulator/simulator running, or a connected device. No backend-specific
-setup needed since this build doesn't talk to one.
+On Windows, the app window is locked at 430×900 (no resizing) to read as
+a phone screen rather than a normal desktop window — change
+`_desktopWindowSize` near the top of `lib/main.dart` if you want
+different dimensions.
+
+**If `flutter run` fails with "could not connect to server" but the app
+works fine from an installed APK on a real phone**: this is almost always
+the emulator's own networking, not the app — the API URL is identical for
+debug and release builds. Try loading any website in the emulator's
+browser first; if that fails too, it's a host-machine/emulator network or
+VPN issue, or an old Android system image failing modern TLS handshakes.
 
 ## Project structure
 
 ```
 lib/
 ├── core/
-│   ├── mock/mock_data.dart     # single source of truth — all app data lives here
-│   ├── routing/app_router.dart # go_router config, auth-aware redirects
-│   ├── theme/                  # colors, app theme
-│   └── widgets/                # splash screen, bottom-nav shell
+│   ├── network/                 # Dio client, token storage, base providers
+│   ├── mock/mock_data.dart      # still used by map_search — not yet wired to the API
+│   ├── routing/app_router.dart  # go_router config, auth-aware redirects
+│   ├── theme/                   # colors, app theme
+│   ├── utils/app_constants.dart # API base URL, storage keys
+│   └── widgets/                 # side drawer, bottom-nav shell, splash screen
 ├── features/
-│   ├── auth/                   # signup/login screens + mock auth state
-│   ├── listings/                # feed, detail, post-listing, filter sheet
-│   ├── map_search/              # OpenStreetMap-based radius search
-│   ├── favorites/                # saved properties screen
-│   └── profile/                  # user info, my listings, logout
-└── main.dart                    # entry point + Windows window sizing
+│   ├── auth/                    # signup/login/forgot-password/verify-email + real repository
+│   ├── listings/                 # feed, detail, post-listing (real API + Cloudinary uploads)
+│   ├── map_search/               # OpenStreetMap radius search (mock data for now)
+│   ├── favorites/                 # saved properties (local-only for now)
+│   └── profile/                   # profile view/edit, email verification banner
+└── main.dart                      # entry point, EasyLocalization + window sizing
 ```
 
-## Connecting the real backend later
+## Localization
 
-When you're ready to wire this up to the actual API:
-
-1. Start the Django backend (`backend/` — see git history / earlier project
-   notes for the full PostgreSQL + PostGIS setup walkthrough).
-2. In `lib/core/mock/mock_data.dart`, the providers
-   (`mockDataProvider`, `favoritesProvider`, `myListingIdsProvider`, etc.)
-   are the seam to replace — swap their `Notifier`/`Provider` bodies for
-   ones that call repository classes talking to Dio instead of holding
-   data in memory. The screens themselves (`listings_screen.dart`,
-   `property_detail_screen.dart`, etc.) were written against these same
-   provider names and mostly won't need to change.
-3. You'll want to bring back `dio`, `flutter_secure_storage`,
-   `cached_network_image`, `geolocator`, and `url_launcher` in
-   `pubspec.yaml` — all removed from this build since they were only there
-   to support backend/network/device-API features.
+All user-facing strings live in `assets/translations/en.json` and
+`ur.json`, kept in sync key-for-key. Add new UI text as a key in both
+files and reference it with `'key_name'.tr()` — never hardcode strings
+directly in a widget.
